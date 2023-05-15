@@ -4,6 +4,7 @@
 #include <Windows.h> /* COORD */ 
 
 #define TITULO "Quadrado Animado"  
+#define QUANTIDADE 10
 
 /* #-#-#-#-#-#-#-#-#-# Declaracoes de variaveis e constantes #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#*/
  
@@ -75,7 +76,6 @@ typedef struct _Janela
 {
 	COORD ponto1;
 	COORD ponto2;
-	COORD centro;
 
 	int linha, coluna,cor;
 	
@@ -89,7 +89,8 @@ typedef struct _Janela
 	|---------------------------------------------------|
 */
 
-typedef struct _quadrado{
+typedef struct _quadrado
+{
 	int cor;
 	DIRECAO direcao;
 	int velocidade;
@@ -97,20 +98,20 @@ typedef struct _quadrado{
 	char *texto;
 }QUADRADO;
 
+
+typedef struct _ambiente
+{
+	QUADRADO Quadrado[QUANTIDADE];
+	JANELA Janela[QUANTIDADE];
+	
+	int AreaTotal, Quantidade, AreaOucupada;
+	
+}AMBIENTE;
+
 /* #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# FIM DAS DECLARAÇÕES DAS VARIAVEIS E CONSTANTES #-#-#-#-#-#-#-#-#-#-#*/ 
 
 /* ################################## DECLARAÇÕES DE FUNCOES  ###########################################*/ 
 	
-/*	|---------------  inicia jogo  -------------------------|
-	|	unica funcao fora da ordem alfabetica  				|
-	|	essa funcao ira realizar a chamada das outras  		|
-	|	funcoes do programa;								|
-	|	RECEBE: NENHUM PARAMETRO 							|
-	|	RETORNA: VOID										|	
-	|-------------------------------------------------------|
-*/
-	
-void inicia_jogo();
 
 /*	|---------------  Cria quadrado ------------------------|
 	|	 O qudrado central tera uma configuração  			|
@@ -165,18 +166,6 @@ void gerencia_janela(JANELA *);
 	|-------------------------------------------------------|
 */
 
-void gerencia_programa(JANELA *, QUADRADO *);
-	
-/*	|---------------  imprime info -------------------------|
-	|		Funcao ira imprimir as informacoes na tela		|
-	|	(direcao, velocidade  e sentido) armazenadas dentro |
-	|	da estrutura QUADRADO;								|
-	|	RECEBE:												|
-	|	-> QUADRADO: tipo de dado que contem as informações |
-	|	do quadrado interno									|
-	|	RETORNA: VOID										|
-	|-------------------------------------------------------|
-*/
 
 void imprime_info(QUADRADO);
 
@@ -224,8 +213,12 @@ void movimenta_quadrado(QUADRADO *, JANELA);
 	|---------------------------------------------------|
 */
 
-void set_ambiente(CONSOLE *, ATIVIDADE);
+void set_console(CONSOLE *, ATIVIDADE);
 
 /*############################  FIM DAS DECLARACOES DAS FUNCOES #####################################*/ 
+
+/* ------------------------------- implementações da nova versão ---------------------------------*/
+
+void CriaAmbiente(AMBIENTE *);
 
 #endif /* quadradoAnimado */ 

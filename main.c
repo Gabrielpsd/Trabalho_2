@@ -20,37 +20,24 @@
 #include <stdlib.h> /* srand(), rand() */ 
 
 #include "conio_v3.2.4.h" /* COLORS */ 
-#include "Quadrado.h"
+#include "Quadrado.h" /* ATIVIDADE */ 
 
-#define QUANTIDADE 1
-#define COR_INICIO_JANELA 9
 
 int main(int argc , char **argv)
 {
+	CONSOLE Console;
+	AMBIENTE Ambiente; 
 	
-	JANELA *Janela, refJanela;
-	CONSOLE *console , Pointer_console;
-	QUADRADO *quadrado, refquad;
-	
-	console = &Pointer_console;
-	Janela = &refJanela;
-	quadrado = &refquad;
 	argc = argc; 
 	argv = argv;
 	
 	srand(time(NULL));
 	
-	Janela->cor = COR_INICIO_JANELA;
+	set_console(&Console, ATIVAR);
 	
-	set_ambiente(console, ATIVAR);
-	cria_ponto(Janela);
-	cria_quadrado(quadrado, *Janela);
-	gerencia_janela(Janela);
-	imprime_info(*quadrado);
+	CriaAmbiente(&Ambiente);
 	
-	gerencia_programa( Janela, quadrado);
-	
-	set_ambiente(console,DESATIVAR);
+	set_console(&Console,DESATIVAR);
 	
 	
 	return 0;

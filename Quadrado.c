@@ -19,7 +19,7 @@ ela somasse a posicao do ponto apenas para poder imprimir em determinado local d
 #define VELOCIDADE 100 /*dada em milisegundos */ 
 #define CARACTER_HORIZONTAL 32
 #define CARACTER_VERTICAL 32
-	
+
 
 /*	|---------------  Cria ponto ---------------------------|
 	|	 Para que possa ser criado as zonas de impacto		|
@@ -113,213 +113,6 @@ void gerencia_janela(JANELA *Janela)
 	}
 	
 	
-}
-
-/*	|---------------  Gerencia Programa --------------------|
-	|		Essa funcao é a funcao que realiza a leitura das| 
-	|	teclas digitadas pelo usuario, como a cada interação|
-	|	o programa ira realizar a verficação e ,caso 		|
-	|	necessario, realizar a chama de outras funcoes, ele |	
-	|	recebe como parametro todas as estruturas			|
-	|-------------------------------------------------------|
-*/
-
-void gerencia_programa(JANELA *janela, QUADRADO *quadrado)
-{	
-	EVENTO evento; 
-	BOOLEANO controle;
-	controle = VERDADEIRO;
-	
-	do
-	{
-		timeBeginPeriod(1);
-		movimenta_quadrado(quadrado, *janela);
-		
-		if(hit(KEYBOARD_HIT))
-		{
-			
-			evento = Evento();
-			
-			if(evento.tipo_evento & KEY_EVENT)
-			{
-				if(evento.teclado.status_tecla == LIBERADA)
-				{
-					switch(evento.teclado.codigo_tecla)
-					{
-						/*-- aumenta a velocidade do quadrado interno -- */
-							case F2:
-								
-								if(quadrado->velocidade > 100)
-								{
-								quadrado->texto = "F2";
-								quadrado->velocidade -= 100;
-								}
-								
-								break;
-							
-						/*-- diminui a velocidade interna do quadrado -- */ 
-							case F1: 
-								
-								if(quadrado->velocidade < 2000)
-								{
-									quadrado->texto = "Tecla F1";
-									quadrado->velocidade += 100;
-								}
-								break;
-								
-							
-							case SETA_PARA_DIREITA:
-							
-								quadrado->texto = "Seta Direita";
-								quadrado->direcao = DIREITA;
-								break;
-								
-							case SETA_PARA_ESQUERDA:
-							
-								quadrado->texto = "Seta Esquerda";
-								quadrado->direcao = ESQUERDA;
-								break;
-								
-							case SETA_PARA_BAIXO:
-								quadrado->direcao = BAIXO;
-								quadrado->texto = "Seta Baixo";
-								break;
-								
-							case SETA_PARA_CIMA:
-							
-								quadrado->texto = "Seta Cima";
-								quadrado->direcao = CIMA;
-								break;
-							
-							/*-- aumenta area do quadrado externo para esquerda -- */
-							case F3:
-							
-								if(janela->ponto1.X > 1)
-								{
-									janela->ponto1.X -= 1;
-									janela->coluna += 1;
-								}
-								
-								quadrado->texto = "F3";
-								break;
-							
-							/*-- diminui a borda do quadrado da esquerda --*/ 							
-							case F4:
-								
-								if(janela->ponto2.X-4 > janela->ponto1.X)
-								{
-									janela->ponto2.X -= 1;
-									janela->coluna -= 1;
-									
-									if(janela->ponto2.X == quadrado->centro.X + 1)
-										quadrado->centro.X--;
-								}
-								quadrado->texto = "Tecla F4";
-								break;
-							
-							/*-- aumenta a area do quadrado para direita --*/
-							case F5:
-								if(janela->coluna < 100 && janela->ponto2.X < 1 + COLUNA)
-								{
-									janela->coluna += 1;
-									janela->ponto2.X += 1; 
-								}
-								quadrado->texto = "Tecla F5";
-								break;
-							
-							/*-- diminui a area da do quadrado para direita --*/
-							case F6: 
-								
-								if(janela->ponto1.X < janela->ponto2.X - 4)
-								{
-									janela->ponto1.X += 1;
-									janela->coluna -= 1;
-									
-									if(janela->ponto1.X == quadrado->centro.X-1)
-										quadrado->centro.X++;
-								}
-								quadrado->texto = "Tecla F6";
-								break;
-								
-							/*-- aumenta a areda do quadrado para cima --*/
-							case F7:
-								if(janela->ponto1.Y > 1)
-								{
-									janela->ponto1.Y -= 1;
-									janela->linha += 1;
-								}
-								quadrado->texto = "Tecla F7";
-								break;
-							
-							/*-- diminui a area superior --*/ 
-							case F8:
-								if(janela->ponto1.Y < janela->ponto2.Y - 5)
-								{
-									janela->ponto1.Y += 1;
-									janela->linha -= 1;
-									
-									if(janela->ponto1.Y == quadrado->centro.Y- 2 )
-										quadrado->centro.Y++;
-								}
-								
-								quadrado->texto = "Tecla F8";
-								break;
-								
-							/*-- aumenta a area para baixo --*/
-							case F9:
-								if(janela->ponto2.Y < LINHA)
-								{
-									janela->ponto2.Y += 1;
-									janela->linha += 1;
-								}
-								quadrado->texto = "Tecla F9";
-								break;
-								
-							/*--diminui a area para baixo --*/
-							case F10:
-								if(janela->ponto2.Y > janela->ponto1.Y + 5)
-								{
-									janela->linha -= 1;
-									janela->ponto2.Y -=1;
-									
-									if(janela->ponto2.Y  == quadrado->centro.Y - 2)
-										quadrado->centro.Y--;
-								}
-								quadrado->texto = "Tecla F10";
-								break;
-								
-							/*--alterna a cor do quadrado --*/
-							case ESPACO:
-								janela->cor = rand() % 15+1;
-								quadrado->texto = "Tecla F10";
-								break;
-								
-							/*-- alterna a cor do quadrado --*/
-							case TAB:
-								quadrado->cor = rand() %15+1;
-								quadrado->texto = "Tecla TAB";
-								break;
-								
-							/*-- finaliza programa --*/
-							case ESC:
-								controle = FALSO;
-								quadrado->texto = "Tecla ESC";
-								
-								break;
-					}
-					
-					gerencia_janela(janela);
-					imprime_info(*quadrado);
-				
-				}
-			}
-		
-		}
-		
-		timeEndPeriod(1);
-		
-	}while(controle == VERDADEIRO);
-
 }
 
 /*	|---------------  imprime info -------------------------|
@@ -425,6 +218,92 @@ void imprime_quadrado(QUADRADO quadrado, ATIVIDADE funcao)
 	|	armazenado dentro da propria estrura QAUDRADO 	 	|
 	|-------------------------------------------------------|
 */
+
+int LeTeclas(){
+	
+	EVENTO evento; 
+	
+	if(hit(KEYBOARD_HIT))
+	{
+			
+		evento = Evento();
+			
+		if(evento.tipo_evento & KEY_EVENT)
+		{
+			if(evento.teclado.status_tecla == LIBERADA)
+			{
+				switch(evento.teclado.codigo_tecla)
+				{
+						
+						case F2:
+								return F2;
+							break;
+						
+					/*-- diminui a velocidade interna do quadrado -- */ 
+						case F1: 
+							return F1;
+
+						case SETA_PARA_DIREITA:
+						
+							return F1;
+						case SETA_PARA_ESQUERDA:
+							
+							return F1;
+						case SETA_PARA_BAIXO:
+							return F1;
+							
+						case SETA_PARA_CIMA:
+							return F1;
+						
+						/*-- aumenta area do quadrado externo para esquerda -- */
+						case F3:
+							return F1;
+						/*-- diminui a borda do quadrado da esquerda --*/ 							
+						case F4:
+							return F1;
+						
+						/*-- aumenta a area do quadrado para direita --*/
+						case F5:
+							return F1;
+							
+						/*-- diminui a area da do quadrado para direita --*/
+						case F6: 
+							return F1;
+							
+						/*-- aumenta a areda do quadrado para cima --*/
+						case F7:
+							return F1;
+								
+						/*-- diminui a area superior --*/ 
+						case F8:
+							return F1;
+							
+						/*-- aumenta a area para baixo --*/
+						case F9:
+							return F1;
+							
+						/*--diminui a area para baixo --*/
+						case F10:
+							return F1;
+							
+						/*--alterna a cor do quadrado --*/
+						case ESPACO:
+							return F1;
+							
+						/*-- alterna a cor do quadrado --*/
+						case TAB:
+							return F1;
+							
+						/*-- finaliza programa --*/
+						case ESC:
+							return F1;
+					}
+				
+				}
+			}
+		
+		}
+}
 
 void movimenta_quadrado(QUADRADO *quadrado, JANELA janela)
 {
@@ -535,4 +414,14 @@ void set_ambiente(CONSOLE *console, ATIVIDADE status)
 		setEstadoBarraTarefas(VISIVEL);
 		setCursorStatus(LIGAR);
 	}
+}
+
+void CriaAmbiente(AMBIENTE *Ambiente)
+{
+	
+	cria_ponto(Ambiente->Janela[0]);
+	cria_quadrado(Ambiente->quadrado[0], Ambiente->Janela);
+	gerencia_janela(Ambiente->Janela);
+	imprime_info(Ambiente->quadrado);
+	
 }
