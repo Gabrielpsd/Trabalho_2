@@ -43,8 +43,6 @@ void cria_ponto(JANELA *Janela)
 	Janela->ponto2.X = Janela->ponto1.X + Janela->coluna ;
 	Janela->ponto2.Y = Janela->ponto1.Y + Janela->linha ;
 	
-	Janela->centro.X = Janela->ponto2.X/2;
-	Janela->centro.Y = Janela->ponto2.Y/2;
 }
 
 /*	|---------------  Cria quadrado  -----------------------|
@@ -58,17 +56,12 @@ void cria_ponto(JANELA *Janela)
 
 void cria_quadrado(QUADRADO *quadrado , JANELA Janela)
 {
-	quadrado->centro.X = Janela.centro.X;
-	quadrado->centro.Y = Janela.centro.Y;
-	
 	quadrado->cor = 1;
 	
 	quadrado->velocidade = VELOCIDADE;
 	quadrado->direcao = rand()%3;
-	quadrado->texto = NULL;
 	imprime_quadrado(*quadrado,ATIVAR);
-	quadrado->textoRef.X = Janela.ponto1.X;
-	quadrado->textoRef.Y = Janela.ponto2.Y;
+
 }
 
 /*	|---------------  Gerencia Janela ----------------------|
@@ -115,6 +108,12 @@ void gerencia_janela(JANELA *Janela)
 	
 }
 
+
+void gerencia_programa(AMBIENTE *Ambiente)
+{
+	movimenta_quadrado(Ambiente, JANELA)
+}
+	
 /*	|---------------  imprime info -------------------------|
 	|	 Funcao ira realizar a impressao das informacoes 	|
 	|	solicitadas no exercicio, essas informações estao	|
@@ -219,7 +218,7 @@ void imprime_quadrado(QUADRADO quadrado, ATIVIDADE funcao)
 	|-------------------------------------------------------|
 */
 
-int LeTeclas(){
+int Le_Teclas(){
 	
 	EVENTO evento; 
 	
@@ -297,12 +296,17 @@ int LeTeclas(){
 						/*-- finaliza programa --*/
 						case ESC:
 							return F1;
+							
+						default:
+							break;
 					}
 				
 				}
 			}
 		
 		}
+		
+	return 0;	
 }
 
 void movimenta_quadrado(QUADRADO *quadrado, JANELA janela)
@@ -368,7 +372,7 @@ void movimenta_quadrado(QUADRADO *quadrado, JANELA janela)
 		|-------------------------------------------------------|
 */
 
-void set_ambiente(CONSOLE *console, ATIVIDADE status)
+void set_console(CONSOLE *console, ATIVIDADE status)
 {
 	if(status){
 		
@@ -418,10 +422,7 @@ void set_ambiente(CONSOLE *console, ATIVIDADE status)
 
 void CriaAmbiente(AMBIENTE *Ambiente)
 {
-	
-	cria_ponto(Ambiente->Janela[0]);
-	cria_quadrado(Ambiente->quadrado[0], Ambiente->Janela);
-	gerencia_janela(Ambiente->Janela);
-	imprime_info(Ambiente->quadrado);
-	
+	cria_ponto(&Ambiente->Janela[0]);
+	cria_quadrado(&Ambiente->Quadrado[0], Ambiente->Janela[0]);
+	gerencia_janela(&Ambiente->Janela[0]);	
 }

@@ -91,11 +91,11 @@ typedef struct _Janela
 
 typedef struct _quadrado
 {
-	int cor;
+	COLORS cor;
 	DIRECAO direcao;
 	int velocidade;
-	COORD centro,textoRef; 
-	char *texto;
+	COORD centro;
+	
 }QUADRADO;
 
 
@@ -165,6 +165,8 @@ void gerencia_janela(JANELA *);
 	|	RETORNA: VOID										|
 	|-------------------------------------------------------|
 */
+
+void gerencia_programa(AMBIENTE *);
 
 
 void imprime_info(QUADRADO);
