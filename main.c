@@ -35,10 +35,9 @@ int main(int argc , char **argv)
 	
 	set_console(&Console, ATIVAR);
 	
-	CriaAmbiente(&Ambiente);
+	cria_ambiente(&Ambiente);
 	
 	set_console(&Console,DESATIVAR);
-	
 	
 	return 0;
 }

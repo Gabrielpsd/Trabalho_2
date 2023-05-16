@@ -74,10 +74,11 @@ typedef struct _tela
 	
 typedef struct _Janela
 {
-	COORD ponto1;
-	COORD ponto2;
+	COORD PontoSE;
+	COORD PontoID;
 
-	int linha, coluna,cor;
+	int Linha, Coluna;
+	COLORS CorJanela;
 	
 }JANELA;
 
@@ -91,11 +92,11 @@ typedef struct _Janela
 
 typedef struct _quadrado
 {
-	COLORS cor;
+	COLORS CorQuadrado;
 	DIRECAO direcao;
 	int velocidade;
 	COORD centro;
-	
+
 }QUADRADO;
 
 
@@ -105,6 +106,7 @@ typedef struct _ambiente
 	JANELA Janela[QUANTIDADE];
 	
 	int AreaTotal, Quantidade, AreaOucupada;
+	COORD PontoInicial, PontoFinal; 
 	
 }AMBIENTE;
 
@@ -113,33 +115,8 @@ typedef struct _ambiente
 /* ################################## DECLARAÇÕES DE FUNCOES  ###########################################*/ 
 	
 
-/*	|---------------  Cria quadrado ------------------------|
-	|	 O qudrado central tera uma configuração  			|
-	|	padrão, essa funcção serve para colocar 	  		|
-	|	a configuração padrão								|
-	|	RECEBE:												|
-	|	->QUADRADO *: ponteiro que armazena a janela 		|
-	|	colorida por onde o quadrado se movimenta.			|
-	|	-> JANELA: coordenadas do consolole para criação da |
-	|	janela.											|
-	|	RETORNA: VOID										|
-	|-------------------------------------------------------|
-*/
-	
-void cria_quadrado(QUADRADO *, JANELA);
+void apaga_quadrado(QUADRADO);
 
-/*	|---------------  cria ponto ---------------------------|
-	|		Ira criar os pontos principais a qual 			|
-	|	o programa ira utilizar como referencia para 		|
-	|	realizar as configurações e movimentações 			|
-	|	RECEBE: 											|
-	|	->Janela *: ponteiro que esta armazenada 			|
-	|	as coordenadas da janela colorida.					|
-	|	RETORNA: VOID										|	
-	|-------------------------------------------------------|
-*/
-
-void cria_ponto(JANELA *);
 
 /*	|---------------  Janela ---------------------------|
 	|	Ira criar a janela principal do jogo			|
@@ -151,25 +128,7 @@ void cria_ponto(JANELA *);
 	|---------------------------------------------------|
 */	
 	
-void gerencia_janela(JANELA *);
-
-/*	|---------------  gerencia programa --------------------|
-	|		Funcao ira realizar as chamadas das funcoes		|
-	|	essa, funcao sera a que ira ler as entradas no 		|
-	|	teclado;											|	
-	|	RECEBE: 											|
-	|	-> QUADRADO * :ponteiro com todas as informações 	|
-	|	do quadrado interno que se movimenta				|
-	|	->JANELA *: ponteiro que contem todas as informações|
-	|	necessarias para manipulação do quadrado colorido 	|
-	|	RETORNA: VOID										|
-	|-------------------------------------------------------|
-*/
-
-void gerencia_programa(AMBIENTE *);
-
-
-void imprime_info(QUADRADO);
+void gerencia_janela(JANELA);
 
 /*	|---------------  imprime quadrado -----------------|
 	|	 	Funcao realiza a impressa do quadrado		|
@@ -185,7 +144,7 @@ void imprime_info(QUADRADO);
 	|---------------------------------------------------|
 */
 
-void imprime_quadrado(QUADRADO, ATIVIDADE);
+void imprime_quadrado(QUADRADO);
 
 /*	|---------------  movimenta quadrado ---------------|
 	|	 	Funcao realiza a movimentacao do quadrado	|
@@ -203,7 +162,7 @@ void imprime_quadrado(QUADRADO, ATIVIDADE);
 	|---------------------------------------------------|
 */
 
-void movimenta_quadrado(QUADRADO *, JANELA);
+void movimenta_quadrado(QUADRADO *);
 
 /*	|--------------- set Ambiente ----------------------|
 	|	Ira criar a definição do prompt do jogo			|
@@ -221,6 +180,9 @@ void set_console(CONSOLE *, ATIVIDADE);
 
 /* ------------------------------- implementações da nova versão ---------------------------------*/
 
-void CriaAmbiente(AMBIENTE *);
+void cria_ambiente(AMBIENTE *);
+
+/* Retornar a telca lida */
+int le_teclas(void);
 
 #endif /* quadradoAnimado */ 
