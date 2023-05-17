@@ -93,9 +93,9 @@ typedef struct _Janela
 typedef struct _quadrado
 {
 	COLORS CorQuadrado;
-	DIRECAO direcao;
-	int velocidade;
-	COORD centro;
+	DIRECAO Direcao;
+	int Velocidade;
+	COORD Centro;
 
 }QUADRADO;
 
@@ -162,7 +162,7 @@ void imprime_quadrado(QUADRADO);
 	|---------------------------------------------------|
 */
 
-void movimenta_quadrado(QUADRADO *);
+void movimenta_quadrado(QUADRADO *,JANELA);
 
 /*	|--------------- set Ambiente ----------------------|
 	|	Ira criar a definição do prompt do jogo			|
@@ -184,5 +184,7 @@ void cria_ambiente(AMBIENTE *);
 
 /* Retornar a telca lida */
 int le_teclas(void);
+
+void depuracao(AMBIENTE);
 
 #endif /* quadradoAnimado */ 
