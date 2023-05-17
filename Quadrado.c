@@ -2,8 +2,7 @@
 
 #include <stdio.h> /*NULL,printf()*/
 #include <stdlib.h> /* srand(), rand() */ 
-
-
+#include <Windows.h> /* Sleep() */
 
 #include "conio_v3.2.4.h" /* textbackground(),gotoxy(),putchar(),textColor() */ 
 #include "console_v1.5.4.h" /* COORD ,getPosicaoJanela(),MaxDimensaoJanela(),getPosicaoJanela(), setPosicaoJanela() 
@@ -32,7 +31,7 @@ ela somasse a posicao do ponto apenas para poder imprimir em determinado local d
 	|-------------------------------------------------------|
 */
 
-void gerencia_janela(JANELA Janela)
+void gerencia_janela(JANELA Janela, int Velocidade)
 {
 	
 	int i; 	
@@ -40,6 +39,8 @@ void gerencia_janela(JANELA Janela)
 	/* para criar a janela sera criada quatro funcoes que tem como controle o tamanho da Linha e da Coluna
 	essas funcoes serao 4 for's para criar as Linhas e as Colunas
 	*/
+
+
 	for(i = 0; i < Janela.Coluna; i++)
 	{
 		/* Linha superior */ 
@@ -63,6 +64,10 @@ void gerencia_janela(JANELA Janela)
 		putchar(CARACTER_VERTICAL);
 	}
 	
+	textcolor(BLACK);
+	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
+	printf("Velocidade Quadrado: %d",Velocidade);
+
 	textbackground(0);
 }
 
@@ -110,15 +115,8 @@ void imprime_quadrado(QUADRADO quadrado)
 	|-------------------------------------------------------|
 */
 
-int le_teclas(){
+int le_teclas(EVENTO evento){
 	
-	EVENTO evento; 
-	
-	if(hit(KEYBOARD_HIT))
-	{
-			
-		evento = Evento();
-			
 		if(evento.tipo_evento & KEY_EVENT)
 		{
 			if(evento.teclado.status_tecla == LIBERADA)
@@ -184,16 +182,14 @@ int le_teclas(){
 						/*-- alterna a cor do quadrado --*/
 						case TAB:
 							return TAB;
-							
+
 						/*-- finaliza programa --*/
 						case ESC:
-							return F1;
+							return ESC;
 					}
 				
 				}
-			}
-		
-		}	
+		}
 
 		return 0; 
 }
@@ -315,7 +311,9 @@ void cria_ambiente(AMBIENTE *Ambiente)
 {
 
 	int i, tecla,controle;
-	
+	EVENTO evento;
+
+	Ambiente->Quantidade = 0;
 
 	Ambiente->Janela[0].PontoSE.X = 2;
 	Ambiente->Janela[0].PontoSE.Y = 2; 
@@ -366,8 +364,11 @@ void cria_ambiente(AMBIENTE *Ambiente)
 		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
 		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
 		Ambiente->Janela[i].CorJanela = 2;
+		Ambiente->Janela[i].JanelaAtual = VERDADEIRO;
+		Ambiente->JanelaAtual = i;
 	}
 	
+	Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = LIGHTGRAY;
 
 	for(i = 0; i < 10; ++i)
 	{
@@ -379,29 +380,38 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 	clrscr();
 
-	for(i = 0; i < 10; ++i)
-			gerencia_janela(Ambiente->Janela[i]);
 	i = tecla = controle = 0;
 
-	for(controle = 0; controle < 10; ++controle)
-	{
-		movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
-	}
-	getchar();
 	do
 	{
+
 		
-		for(controle = 0; controle < 10; ++controle)
-		{
-			if(Ambiente->Quadrado[controle].Velocidade == i)
-				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
-		}
-		
+		/* operador ternario, substitui o if */
 		i = (i == 1000) ?  0 : i + 1;
 
-		tecla = le_teclas();
+		if(hit(KEYBOARD_HIT))
+		{
+			evento = Evento();
+			tecla = le_teclas(evento);
+		}
 
-	}while(tecla != ESPACO);
+		if(tecla == ESPACO && Ambiente->Quantidade < 10)
+		{
+			Ambiente->Quantidade= Ambiente->Quantidade + 1;
+			tecla = 0;	
+
+			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
+				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
+		}
+
+		for(controle = 0; controle < Ambiente->Quantidade;++controle)
+		{	
+			if(i%Ambiente->Quadrado[controle].Velocidade == 0)
+				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
+		}
+		++i;
+
+	}while(tecla != ESC);
 
 }
 

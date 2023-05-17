@@ -1,4 +1,4 @@
-/* --------------------- PASSOS A COSNEGUIR REALIZAR ------------------- */
+/* --------------------- PASSOS A CONSEGUIR REALIZAR ------------------- */
 
 1 - Conseguir transformar a estrutura QUADRADO e JANELA em vetores (FEITO)
 2 - Conseguir imprimir uma janela na tela - como vetor (FEITO)
@@ -8,6 +8,6 @@
 6 - conseguir imprimir 1 quadrado dentro cada das 10(FEITO); 
 7 - conseguir movimentar todos os quadrados simultanemente- sem conflito(FEITO);
 8 - conseguir implementar o conflito em todas as janelas simultanemtente(FEITO); 
- - Imprimir apenas uma janela, e ir colocando mais com cliques do usuario;
+ - Imprimir apenas uma janela, e ir colocando mais com cliques do usuario(FEITO);
  - criar a funcao que determina com qual janela esta se trabalhando;
  - implementar a seleção por mouse;

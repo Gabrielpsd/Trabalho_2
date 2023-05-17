@@ -3,6 +3,8 @@
 
 #include <Windows.h> /* COORD */ 
 
+#include "console_v1.5.4.h" /* EVENTO */
+
 #define TITULO "Quadrado Animado"  
 #define QUANTIDADE 10
 
@@ -17,6 +19,18 @@
 	|	enum que representa esses valores				|
 	|---------------------------------------------------|
 */
+typedef enum controle{
+	JANELA1,
+	JANELA2,
+	JANELA3,
+	JANELA4,
+	JANELA5,
+	JANELA6,
+	JANELA7,
+	JANELA8,
+	JANELA9,
+	JANELA10
+}BOLADAVEZ;
 
 typedef enum
 {
@@ -79,7 +93,7 @@ typedef struct _Janela
 
 	int Linha, Coluna;
 	COLORS CorJanela;
-	
+	BOOLEANO JanelaAtual; 
 }JANELA;
 
 /*	|-------------------  quadrado interno -------------|
@@ -107,7 +121,7 @@ typedef struct _ambiente
 	
 	int AreaTotal, Quantidade, AreaOucupada;
 	COORD PontoInicial, PontoFinal; 
-	
+	BOLADAVEZ JanelaAtual;
 }AMBIENTE;
 
 /* #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# FIM DAS DECLARAÇÕES DAS VARIAVEIS E CONSTANTES #-#-#-#-#-#-#-#-#-#-#*/ 
@@ -128,7 +142,7 @@ void apaga_quadrado(QUADRADO);
 	|---------------------------------------------------|
 */	
 	
-void gerencia_janela(JANELA);
+void gerencia_janela(JANELA, INT);
 
 /*	|---------------  imprime quadrado -----------------|
 	|	 	Funcao realiza a impressa do quadrado		|
@@ -183,8 +197,10 @@ void set_console(CONSOLE *, ATIVIDADE);
 void cria_ambiente(AMBIENTE *);
 
 /* Retornar a telca lida */
-int le_teclas(void);
+int le_teclas(EVENTO);
 
 void depuracao(AMBIENTE);
+
+void executa_acao(int);
 
 #endif /* quadradoAnimado */ 
