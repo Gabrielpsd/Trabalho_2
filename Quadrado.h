@@ -7,6 +7,7 @@
 
 #define TITULO "Quadrado Animado"  
 #define QUANTIDADE 10
+#define CTRL 29
 
 /* #-#-#-#-#-#-#-#-#-# Declaracoes de variaveis e constantes #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#*/
  
@@ -20,7 +21,8 @@
 	|---------------------------------------------------|
 */
 typedef enum controle{
-	JANELA1,
+	NENHUMA = -1,
+	JANELA1 = 0,
 	JANELA2,
 	JANELA3,
 	JANELA4,
@@ -197,10 +199,12 @@ void set_console(CONSOLE *, ATIVIDADE);
 void cria_ambiente(AMBIENTE *);
 
 /* Retornar a telca lida */
-int le_teclas(EVENTO);
+BOOLEANO le_teclas(EVENTO,AMBIENTE *);
 
 void depuracao(AMBIENTE);
 
 void executa_acao(int);
+
+void gerencia_programa(AMBIENTE *);
 
 #endif /* quadradoAnimado */ 

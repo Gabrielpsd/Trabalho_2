@@ -36,6 +36,8 @@ int main(int argc , char **argv)
 	set_console(&Console, ATIVAR);
 	
 	cria_ambiente(&Ambiente);
+
+	gerencia_programa(&Ambiente);
 	
 	set_console(&Console,DESATIVAR);
 	

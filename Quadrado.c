@@ -35,7 +35,11 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 {
 	
 	int i; 	
-	textbackground(Janela.CorJanela);
+
+	if(Janela.JanelaAtual == VERDADEIRO)
+		textbackground(Janela.CorJanela);
+	else
+		textbackground(LIGHTGRAY);
 	/* para criar a janela sera criada quatro funcoes que tem como controle o tamanho da Linha e da Coluna
 	essas funcoes serao 4 for's para criar as Linhas e as Colunas
 	*/
@@ -67,6 +71,7 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 	textcolor(BLACK);
 	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
 	printf("Velocidade Quadrado: %d",Velocidade);
+
 
 	textbackground(0);
 }
@@ -115,7 +120,7 @@ void imprime_quadrado(QUADRADO quadrado)
 	|-------------------------------------------------------|
 */
 
-int le_teclas(EVENTO evento){
+BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 	
 		if(evento.tipo_evento & KEY_EVENT)
 		{
@@ -123,81 +128,105 @@ int le_teclas(EVENTO evento){
 			{
 				switch(evento.teclado.codigo_tecla)
 				{
+					case ESPACO:
 						
-						case F2:
-								return F2;
-							break;
 						
+						if(Ambiente->Quantidade < 10){
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+							/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
+							Ambiente->JanelaAtual++;
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+							Ambiente->Quantidade++;
+						}
+
+
+						break;
+
+					case F2:
+						
+						if(Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade < 1000)
+							Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade++;
+						break;
+					
 					/*-- diminui a velocidade interna do quadrado -- */ 
-						case F1: 
-							return F1;
+					case F1: 
 
-						case SETA_PARA_DIREITA:
-						
-							return F1;
-						case SETA_PARA_ESQUERDA:
-							
-							return F1;
-						case SETA_PARA_BAIXO:
-							return F1;
-							
-						case SETA_PARA_CIMA:
-							return F1;
-						
-						/*-- aumenta area do quadrado externo para esquerda -- */
-						case F3:
-							return F3;
-						/*-- diminui a borda do quadrado da esquerda --*/ 							
-						case F4:
-							return F4;
-						
-						/*-- aumenta a area do quadrado para direita --*/
-						case F5:
-							return F5;
-							
-						/*-- diminui a area da do quadrado para direita --*/
-						case F6: 
-							return F6;
-							
-						/*-- aumenta a areda do quadrado para cima --*/
-						case F7:
-							return F6;
-								
-						/*-- diminui a area superior --*/ 
-						case F8:
-							return F8;
-							
-						/*-- aumenta a area para baixo --*/
-						case F9:
-							return F9;
-							
-						/*--diminui a area para baixo --*/
-						case F10:
-							return F10;
-							
-						/*--alterna a cor do quadrado --*/
-						case ESPACO:
-							return ESPACO;
-							
-						/*-- alterna a cor do quadrado --*/
-						case TAB:
-							return TAB;
+						if(Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade >1)
+							Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade--;
 
-						/*-- finaliza programa --*/
-						case ESC:
-							return ESC;
-					}
-				
+						break;
+
+					case SETA_PARA_DIREITA:
+						
+						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = DIREITA;
+						break;
+
+					case SETA_PARA_ESQUERDA:
+						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = ESQUERDA;
+						break;
+
+					case SETA_PARA_BAIXO:
+						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = BAIXO;
+						break;
+						
+					case SETA_PARA_CIMA:
+						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = CIMA;
+						break;
+					
+					/*-- aumenta area do quadrado externo para esquerda -- */
+					case F3:
+						return F3;
+					/*-- diminui a borda do quadrado da esquerda --*/ 							
+					case F4:
+						return F4;
+					
+					/*-- aumenta a area do quadrado para direita --*/
+					case F5:
+						return F5;
+						
+					/*-- diminui a area da do quadrado para direita --*/
+					case F6: 
+						return F6;
+						
+					/*-- aumenta a areda do quadrado para cima --*/
+					case F7:
+						return F6;
+							
+					/*-- diminui a area superior --*/ 
+					case F8:
+						return F8;
+						
+					/*-- aumenta a area para baixo --*/
+					case F9:
+						return F9;
+						
+					/*--diminui a area para baixo --*/
+					case F10:
+						return F10;
+						
+					/*--alterna a cor do quadrado --*/
+					case CTRL:
+						return 0;
+						
+					/*-- alterna a cor do quadrado --*/
+					case TAB:
+						return TAB;
+
+					/*-- finaliza programa --*/
+					case ESC:
+							return FALSO;
 				}
+				
+			}
 		}
 
-		return 0; 
+		return 1; 
 }
 
 void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
 {	
 	
-	Quadrado->CorQuadrado = GREEN;
 	apaga_quadrado(*Quadrado);
 	
 	switch (Quadrado->Direcao)
@@ -310,10 +339,11 @@ void set_console(CONSOLE *console, ATIVIDADE status)
 void cria_ambiente(AMBIENTE *Ambiente)
 {
 
-	int i, tecla,controle;
-	EVENTO evento;
+	int i;
 
-	Ambiente->Quantidade = 0;
+	Ambiente->Quantidade = -1;
+	Ambiente->JanelaAtual = NENHUMA;
+
 
 	Ambiente->Janela[0].PontoSE.X = 2;
 	Ambiente->Janela[0].PontoSE.Y = 2; 
@@ -324,7 +354,8 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Janela[0].PontoID.X = Ambiente->Janela[0].PontoSE.X + Ambiente->Janela[0].Coluna;
 	Ambiente->Janela[0].PontoID.Y = Ambiente->Janela[0].PontoSE.Y + Ambiente->Janela[0].Linha; 
 
-	Ambiente->Janela[0].CorJanela = 2; 
+	Ambiente->Janela[0].CorJanela = rand()%15 + 1; 
+	Ambiente->Janela[0].JanelaAtual = FALSO;
 
 	/* -------------------- QUADRADOS SUPERIORES ------------------*/
 	for(i = 1; i < 5;++i)
@@ -337,7 +368,9 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
 		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-		Ambiente->Janela[i].CorJanela = 2; 
+		Ambiente->Janela[i].CorJanela = rand()%15 + 1; 
+
+		Ambiente->Janela[i].JanelaAtual = FALSO;
 	}
 
 	/*---------------------- QUADRADOS INFERIORES ---------------------*/
@@ -351,7 +384,9 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Janela[5].PontoID.X = Ambiente->Janela[5].PontoSE.X + Ambiente->Janela[5].Coluna;
 	Ambiente->Janela[5].PontoID.Y = Ambiente->Janela[5].PontoSE.Y + Ambiente->Janela[5].Linha; 
 
-	Ambiente->Janela[5].CorJanela = 2; 
+	Ambiente->Janela[5].JanelaAtual = FALSO;
+
+	Ambiente->Janela[5].CorJanela = rand()%15 + 1; 
 	
 	for(i = 6; i < 10;++i)
 	{
@@ -363,12 +398,9 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
 		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-		Ambiente->Janela[i].CorJanela = 2;
-		Ambiente->Janela[i].JanelaAtual = VERDADEIRO;
-		Ambiente->JanelaAtual = i;
+		Ambiente->Janela[i].CorJanela = rand()%15 + 1;
+		Ambiente->Janela[i].JanelaAtual = FALSO;
 	}
-	
-	Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = LIGHTGRAY;
 
 	for(i = 0; i < 10; ++i)
 	{
@@ -376,48 +408,19 @@ void cria_ambiente(AMBIENTE *Ambiente)
 		Ambiente->Quadrado[i].Centro.Y = Ambiente->Janela[i].PontoID.Y - Ambiente->Janela[i].Linha / 2;
 		Ambiente->Quadrado[i].Velocidade = rand()%1000;
 		Ambiente->Quadrado[i].Direcao = rand() %4;
+		Ambiente->Quadrado[i].CorQuadrado = rand()%15 + 1;
 	}
 
+	depuracao(*Ambiente);
+
 	clrscr();
-
-	i = tecla = controle = 0;
-
-	do
-	{
-
-		
-		/* operador ternario, substitui o if */
-		i = (i == 1000) ?  0 : i + 1;
-
-		if(hit(KEYBOARD_HIT))
-		{
-			evento = Evento();
-			tecla = le_teclas(evento);
-		}
-
-		if(tecla == ESPACO && Ambiente->Quantidade < 10)
-		{
-			Ambiente->Quantidade= Ambiente->Quantidade + 1;
-			tecla = 0;	
-
-			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
-				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
-		}
-
-		for(controle = 0; controle < Ambiente->Quantidade;++controle)
-		{	
-			if(i%Ambiente->Quadrado[controle].Velocidade == 0)
-				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
-		}
-		++i;
-
-	}while(tecla != ESC);
 
 }
 
 void apaga_quadrado(QUADRADO Quadrado){
 
 	int i,j;
+	
 
 	textbackground(BLACK);
 	for(i = 0; i < 3; ++i)
@@ -431,11 +434,51 @@ void apaga_quadrado(QUADRADO Quadrado){
 
 }
 
+void gerencia_programa(AMBIENTE *Ambiente)
+{
+	int i,tecla,controle;	
+	EVENTO evento;
+
+	i = controle = 0;
+
+	tecla = 1;
+
+
+	do
+	{	
+		/* operador ternario, substitui o if */
+		i = (i == 1000) ?  0 : i + 1;
+
+		if(hit(KEYBOARD_HIT))
+		{
+			evento = Evento();
+			tecla = le_teclas(evento, Ambiente);
+
+			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
+				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
+
+		}
+
+		for(controle = 0; controle < Ambiente->Quantidade;++controle)
+		{	
+			if(i%Ambiente->Quadrado[controle].Velocidade == 0)
+				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
+
+		}
+
+		++i;
+	
+	}while(tecla != FALSO);
+
+}
+
+
 void depuracao(AMBIENTE Ambiente)
 {	
 	int i;
-	for(i = 0; i < 10; ++i)
+	for(i = 9; i < 10; ++i)
 	{
+		
 		printf(" --------------- %do janela -------------------\n ", i+1);
 		printf("Diagonal superior esquerda: X = %d e Y = %d \n ",Ambiente.Janela[i].PontoSE.X,Ambiente.Janela[i].PontoSE.Y);
 		printf("Diagonal inferior direita: X = %d e Y = %d \n ",Ambiente.Janela[i].PontoID.X,Ambiente.Janela[i].PontoID.Y);
@@ -446,6 +489,7 @@ void depuracao(AMBIENTE Ambiente)
 		printf("\tCentro: X = %d e Y = %d \n ",Ambiente.Quadrado[i].Centro.X,Ambiente.Quadrado[i].Centro.Y);
 		printf("\tVelocidade: X = %d Direcao = %d \n ",Ambiente.Quadrado[i].Velocidade,Ambiente.Quadrado[i].Direcao);
 		printf(" --------------- ---------  -------------------\n ");
+
 		getchar();
 	}
 
