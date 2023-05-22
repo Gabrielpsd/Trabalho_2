@@ -122,6 +122,9 @@ void imprime_quadrado(QUADRADO quadrado)
 
 BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 	
+	int controle;
+	COORD Auxiliar;
+
 		if(evento.tipo_evento & KEY_EVENT)
 		{
 			if(evento.teclado.status_tecla == LIBERADA)
@@ -218,6 +221,30 @@ BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 							return FALSO;
 				}
 				
+			}
+			else if(evento.tipo_evento & MOUSE_EVENT)
+			{
+				if(evento.mouse.botao_clicou & BOTAO_ESQUERDO_PRESSIONADO)
+				{
+					Auxiliar  = evento.mouse.posicao;
+
+					for(controle = 0; controle < Ambiente->Quantidade; ++controle)
+					{
+						printf("x = %d y %d ",Auxiliar.X,Auxiliar.Y);
+						getchar();
+						
+						if((Ambiente->Janela[controle].PontoSE.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y > Auxiliar.Y))
+						{
+							if((Ambiente->Janela[controle].PontoID.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y < Auxiliar.Y))
+							{
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+							Ambiente->JanelaAtual = controle;
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+							}
+						}
+
+					}
+				}
 			}
 		}
 
@@ -341,8 +368,8 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 	int i;
 
-	Ambiente->Quantidade = -1;
-	Ambiente->JanelaAtual = NENHUMA;
+	Ambiente->Quantidade = 1;
+	Ambiente->JanelaAtual = 0;
 
 
 	Ambiente->Janela[0].PontoSE.X = 2;
@@ -411,8 +438,6 @@ void cria_ambiente(AMBIENTE *Ambiente)
 		Ambiente->Quadrado[i].CorQuadrado = rand()%15 + 1;
 	}
 
-	depuracao(*Ambiente);
-
 	clrscr();
 
 }
@@ -442,6 +467,8 @@ void gerencia_programa(AMBIENTE *Ambiente)
 	i = controle = 0;
 
 	tecla = 1;
+
+	gerencia_janela(Ambiente->Janela[0], Ambiente->Quadrado[0].Velocidade);
 
 
 	do
