@@ -51,6 +51,14 @@ typedef enum
 	VERDADEIRO
 }BOOLEANO;
 
+
+typedef enum
+{
+	ENCERRARPROGRAMA,
+	REIPRIMIRJANELA,
+	CONTINUAR
+	
+}OQUEFAZER;
 /*	|---------------- Direcao  -------------------------|
 	|		Nessa estrutura sera numerada as 			|
 	|	direções que o quadrado pode seguir				|
@@ -199,7 +207,7 @@ void set_console(CONSOLE *, ATIVIDADE);
 void cria_ambiente(AMBIENTE *);
 
 /* Retornar a telca lida */
-BOOLEANO le_teclas(EVENTO,AMBIENTE *);
+OQUEFAZER le_teclas(EVENTO,AMBIENTE *);
 
 void depuracao(AMBIENTE);
 

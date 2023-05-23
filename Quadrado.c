@@ -120,7 +120,7 @@ void imprime_quadrado(QUADRADO quadrado)
 	|-------------------------------------------------------|
 */
 
-BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
+OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 	
 	int controle;
 	COORD Auxiliar;
@@ -143,6 +143,7 @@ BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 							Ambiente->Quantidade++;
 						}
 
+						return REIPRIMIRJANELA;
 
 						break;
 
@@ -150,6 +151,8 @@ BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 						
 						if(Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade < 1000)
 							Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade++;
+
+							
 						break;
 					
 					/*-- diminui a velocidade interna do quadrado -- */ 
@@ -218,34 +221,38 @@ BOOLEANO le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 
 					/*-- finaliza programa --*/
 					case ESC:
-							return FALSO;
+							return ENCERRARPROGRAMA;
 				}
 				
 			}
-			else if(evento.tipo_evento & MOUSE_EVENT)
+
+
+			
+		} 
+		else if(evento.tipo_evento & MOUSE_EVENT)
+		{
+			if(evento.mouse.botao_clicou & BOTAO_ESQUERDO_PRESSIONADO)
 			{
-				if(evento.mouse.botao_clicou & BOTAO_ESQUERDO_PRESSIONADO)
+				Auxiliar  = evento.mouse.posicao;
+				
+				for(controle = 0; controle < Ambiente->Quantidade; ++controle)
 				{
-					Auxiliar  = evento.mouse.posicao;
-
-					for(controle = 0; controle < Ambiente->Quantidade; ++controle)
+					if((Ambiente->Janela[controle].PontoSE.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y > Auxiliar.Y))
 					{
-						printf("x = %d y %d ",Auxiliar.X,Auxiliar.Y);
-						getchar();
-						
-						if((Ambiente->Janela[controle].PontoSE.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y > Auxiliar.Y))
+						if((Ambiente->Janela[controle].PontoID.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y < Auxiliar.Y))
 						{
-							if((Ambiente->Janela[controle].PontoID.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y < Auxiliar.Y))
-							{
-							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-							Ambiente->JanelaAtual = controle;
-							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-							}
+						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+						Ambiente->JanelaAtual = controle;
+						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 						}
-
 					}
+
 				}
+
+				return REIPRIMIRJANELA;
 			}
+
+			return CONTINUAR;
 		}
 
 		return 1; 
@@ -461,12 +468,13 @@ void apaga_quadrado(QUADRADO Quadrado){
 
 void gerencia_programa(AMBIENTE *Ambiente)
 {
-	int i,tecla,controle;	
+	int i,controle;	
 	EVENTO evento;
+	OQUEFAZER auxiliar;
 
 	i = controle = 0;
 
-	tecla = 1;
+	auxiliar = CONTINUAR;
 
 	gerencia_janela(Ambiente->Janela[0], Ambiente->Quadrado[0].Velocidade);
 
@@ -476,14 +484,18 @@ void gerencia_programa(AMBIENTE *Ambiente)
 		/* operador ternario, substitui o if */
 		i = (i == 1000) ?  0 : i + 1;
 
-		if(hit(KEYBOARD_HIT))
+		if(hit(ALL))
 		{
 			evento = Evento();
-			tecla = le_teclas(evento, Ambiente);
+			auxiliar = le_teclas(evento, Ambiente);
+		}
 
+		if(auxiliar == REIPRIMIRJANELA)
+		{
 			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
 				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
 
+			auxiliar = CONTINUAR;
 		}
 
 		for(controle = 0; controle < Ambiente->Quantidade;++controle)
@@ -495,7 +507,7 @@ void gerencia_programa(AMBIENTE *Ambiente)
 
 		++i;
 	
-	}while(tecla != FALSO);
+	}while(auxiliar != ENCERRARPROGRAMA);
 
 }
 
