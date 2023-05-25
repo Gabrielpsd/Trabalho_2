@@ -52,6 +52,14 @@ typedef enum
 }BOOLEANO;
 
 
+/*	|---------------- OQUEFAZER  ---------------------------|
+	|		Esse eh um tipo de dado criado exclusivamente	|
+	|	para a funcao le_teclas, pois assim que sair 		|
+	|	da funcao ele parametrizará o comportamento de 		|
+	|	outras chamadas										|
+	|-------------------------------------------------------|
+*/
+
 typedef enum
 {
 	ENCERRARPROGRAMA,
@@ -59,6 +67,8 @@ typedef enum
 	CONTINUAR
 	
 }OQUEFAZER;
+
+
 /*	|---------------- Direcao  -------------------------|
 	|		Nessa estrutura sera numerada as 			|
 	|	direções que o quadrado pode seguir				|
@@ -138,6 +148,31 @@ typedef struct _ambiente
 
 /* ################################## DECLARAÇÕES DE FUNCOES  ###########################################*/ 
 	
+/*	|---------------  imprime quadrado -----------------|
+	|	 	Funcao realizada a filtragem do evento 		|
+	|	e realiza funcao de acordo com o evento 		|
+	|	armazenado	na variavel;						|
+	|	RECEBE: 										|
+	|	-> EVENTO: Variavel que contem o evento 		|
+	|	lido no console;								|
+	|	->AMBIENTE: ponteiro que armazaena um			|
+	|	ambiente a ser modificado 						|
+	|	RETORNA:enum do tipo OQUEFAZER					|
+	|---------------------------------------------------|
+*/
+
+OQUEFAZER le_teclas(EVENTO,AMBIENTE *);
+
+
+/*	|---------------  imprime quadrado -----------------|
+	|	 	Funcao que recebe um quadrado e com suas 	|
+	|	coordanas ira apaga-lo							|
+	|	RECEBE: 										|
+	|	-> QUADRADO: varivael do tipo quadrado 			|
+	|	ambiente a ser modificado 						|
+	|	RETORNA: void									|
+	|---------------------------------------------------|
+*/
 
 void apaga_quadrado(QUADRADO);
 
@@ -148,7 +183,7 @@ void apaga_quadrado(QUADRADO);
 	|		Tamanho Maximo;								|
 	|	RECEBE:					|
 	|	-> JANELA *: ponteiro para a janela do jogo		|	
-	|	ETORNA: VOID 									|
+	|	RETORNA: VOID 									|
 	|---------------------------------------------------|
 */	
 	
@@ -169,6 +204,20 @@ void gerencia_janela(JANELA, INT);
 */
 
 void imprime_quadrado(QUADRADO);
+
+
+/*	|--------------- Gerencia programa   ---------------|
+	|	 	Funcao que realiza as chamadas do 			|
+	|	programa princial;								|
+	|	RECEBE: 										|
+	|	->AMBIENTE: POnteiro que armazena um AMBIENTE	|
+	|	a ser trabalhado								|
+	|	RETORNA:VOID									|
+	|---------------------------------------------------|
+*/
+
+void gerencia_programa(AMBIENTE *);
+
 
 /*	|---------------  movimenta quadrado ---------------|
 	|	 	Funcao realiza a movimentacao do quadrado	|
@@ -206,13 +255,10 @@ void set_console(CONSOLE *, ATIVIDADE);
 
 void cria_ambiente(AMBIENTE *);
 
-/* Retornar a telca lida */
-OQUEFAZER le_teclas(EVENTO,AMBIENTE *);
-
 void depuracao(AMBIENTE);
 
 void executa_acao(int);
 
-void gerencia_programa(AMBIENTE *);
+
 
 #endif /* quadradoAnimado */ 

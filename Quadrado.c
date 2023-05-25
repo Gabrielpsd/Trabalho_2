@@ -22,12 +22,117 @@ ela somasse a posicao do ponto apenas para poder imprimir em determinado local d
 #define BORDA_JANELA 32 /* ESPACO NA TABELA ASCII*/
 
 /*dimensoa 168 * 42 */
+
+/*		|---------------  Gerencia programa --------------------|
+		|	 Realiza o cotrole de das movimentações do quadrado	|
+		|	le realiza o reconhecimento de algum evento e 		|
+		|	repassa a informacao e dpois com o retorno da funcao|
+		|	le_teclas ela segue para a o novo parametro 		|
+		|	de acordo com o retorno do que receber;				|
+		|		Unica funcao que esta fora da ordem alfabetica, |
+		|	por ser a que realiza o controle de todas as		|
+		|	chamadas; 											|			
+		|-------------------------------------------------------|
+*/
+
+void gerencia_programa(AMBIENTE *Ambiente)
+{
+	int i,controle;	
+	EVENTO evento;
+	OQUEFAZER auxiliar;
+
+	i = controle = 0;
+
+	auxiliar = CONTINUAR;
+
+	/* cria a primeira janela */
+	gerencia_janela(Ambiente->Janela[0], Ambiente->Quadrado[0].Velocidade);
+
+
+	do
+	{	
+		/* operador ternario, substitui o if;
+		toda vez que i atingir 1000 ele retornara para 1, i representa os milissegundos */
+		i = (i == 1000) ?  0 : i + 1;
+
+
+		/* verifica se houve algum evento, tanto de telcado quanto de mouse */
+		if(hit(ALL))
+		{
+
+			/* armazena o evento que ocorreu*/
+			evento = Evento();
+
+			/* repassa o evento para ser tratado*/
+			auxiliar = le_teclas(evento, Ambiente);
+		}
+
+		/* caso o parametro de retorno seja o de REIMPRIMIR a janela ele entrara nesse if e ira realizar a impressao de todas as janeas novamente*/
+		if(auxiliar == REIPRIMIRJANELA)
+		{
+			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
+				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
+
+			auxiliar = CONTINUAR;
+		}
+
+
+		/* realizada a movimentacao dos quadrado*/
+		for(controle = 0; controle < Ambiente->Quantidade;++controle)
+		{	
+
+			/* o controle é feito em milisegundos e toda a vez que a contagem atingir a velocidade do quadrado ele 
+			chamara a funcao que movimenta o quadrado */
+			if(i%Ambiente->Quadrado[controle].Velocidade == 0)
+				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
+
+		}
+
+		/* realiza o incremento do i que nesse caso representa que mais um milissegundo no tempo de execucao */
+		++i;
+	
+	}while(auxiliar != ENCERRARPROGRAMA);
+
+}
+
+/*	|---------------  Apaga quadrado    ----------------|
+	|	 	Funcao ira receber um quadrado e atraves 	|
+	|	da sua coordenada do centro e ira realizar a 	|
+	|	exclusao do mesmo. A exclusao ocorre realizando	|
+	|	a sobreposicao das posicoes que o quadrado esta	|
+	|	por um caractere espaco com a cor de fundo 		|
+	|	preta.											|
+	|---------------------------------------------------|
+*/
+
+void apaga_quadrado(QUADRADO Quadrado)
+{
+
+	int i,j;
+	
+
+	textbackground(BLACK);
+	for(i = 0; i < 3; ++i)
+	{
+		for(j = 0; j < 3; ++j)
+		{
+			gotoxy(Quadrado.Centro.X - 1 + j, Quadrado.Centro.Y - 1 + i);
+			putchar(BORDA_JANELA);
+		}
+	}
+
+}
+
 /*	|---------------  Gerencia Janela ----------------------|
 	|	 Cria a janela principal.							|	
-	|	A funcao utiliza os 3 pontos da estrutura PONTO 	|
-	|	como referencia, trocando a cor do fundo 		 	|
-	|	caracter por caracter conectando os  pontos das  	|
-	|	diagonais											|
+	|		A funcao recebe uma JANELA  ,que ja vai estar 	|
+	|	com	os pontos das diagonais determinados, e ira 	|
+	|	realizar a ligacao entre esses pontos com o 		|
+	|	caracter de espaco com a cor de fundo armazenado 	|
+	|	na janela para a janela em utilizacao e a coloracao |
+	|	cinza para os demais;								|
+	|		Tambem recebe a velocidade do quadrado interno 	|
+	|	que deve ser passado na chamada						|
 	|-------------------------------------------------------|
 */
 
@@ -68,6 +173,8 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 		putchar(CARACTER_VERTICAL);
 	}
 	
+
+	/*imprime a velocidade da janela */
 	textcolor(BLACK);
 	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
 	printf("Velocidade Quadrado: %d",Velocidade);
@@ -113,10 +220,78 @@ void imprime_quadrado(QUADRADO quadrado)
 }
 
 /*	|---------------  movimenta quadrado -------------------|
-	|	 A funcao movimenta quadrado, realiza o deslocamento|
-	|	do ponto central do quadrado para uma posicao em 	|
-	|	Direcao a que esta contida no campo direcao 		|
-	|	armazenado dentro da propria estrura QAUDRADO 	 	|
+	|	 	A funcao movimenta o quadrado, 					|
+	|		1o - ela primeiramente apaga o quadrado atual; 	|
+	|		2o - depois seta a posicao do centro para a nova| 
+	|	direcao que o quadrado esta se movimentando; 		|
+	|		3o reimprime o quadrado na nova posicao;		|
+	|	OBS: o tempo de movimentacao deve ser controlado	|
+	|	nas chamadas da funcao;								|
+	|-------------------------------------------------------|
+*/
+
+void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
+{	
+	
+	/* apaga o quadrado atual*/
+	apaga_quadrado(*Quadrado);
+	
+
+	/* reposiciona o quadrado na nova direcao, realizando as validacoes de conflito com a borda da janela*/
+	switch (Quadrado->Direcao)
+	{
+		
+
+		case (CIMA):
+		
+	
+			if(Quadrado->Centro.Y - 2 == janela.PontoSE.Y)
+				Quadrado->Direcao = BAIXO;
+			else
+				Quadrado->Centro.Y = (Quadrado->Centro.Y) - 1 ;
+			
+			break;
+
+		case (BAIXO):
+			
+			
+			if(Quadrado->Centro.Y + 3 == janela.PontoID.Y)
+				Quadrado->Direcao = CIMA;
+			else
+				Quadrado->Centro.Y =(Quadrado->Centro.Y)+1;
+			
+			break;
+
+		case (ESQUERDA):
+			
+				
+			if(Quadrado->Centro.X - 2 == janela.PontoSE.X)
+				Quadrado->Direcao = DIREITA;
+			else
+				Quadrado->Centro.X = (Quadrado->Centro.X) - 1 ;
+			
+			break;
+		case (DIREITA):
+			
+				
+			if(Quadrado->Centro.X + 2 == janela.PontoID.X)
+				Quadrado->Direcao = ESQUERDA;
+			else
+				Quadrado->Centro.X = (Quadrado->Centro.X) + 1 ;
+			
+			break;
+	}
+
+	/* reimprime o novo quadrado*/
+	imprime_quadrado(*Quadrado);
+}
+
+/*	|---------------  Le teclas ----------------------------|
+	|	 Funcao que é chamada quando o programa reconhece	|
+	|	um evento. Realizada a filtragem do evento realiza 	|
+	|	as alterações, quando necessario, e retorna como	|
+	|	parametro como o programa deve prosseguir de acordo	|
+	|	com o evento lido	 								|
 	|-------------------------------------------------------|
 */
 
@@ -233,13 +408,15 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 		{
 			if(evento.mouse.botao_clicou & BOTAO_ESQUERDO_PRESSIONADO)
 			{
+
 				Auxiliar  = evento.mouse.posicao;
-				
+		
+
 				for(controle = 0; controle < Ambiente->Quantidade; ++controle)
 				{
-					if((Ambiente->Janela[controle].PontoSE.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y > Auxiliar.Y))
+					if((Ambiente->Janela[controle].PontoSE.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y < Auxiliar.Y))
 					{
-						if((Ambiente->Janela[controle].PontoID.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y < Auxiliar.Y))
+						if((Ambiente->Janela[controle].PontoID.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y > Auxiliar.Y))
 						{
 						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 						Ambiente->JanelaAtual = controle;
@@ -258,57 +435,6 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 		return 1; 
 }
 
-void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
-{	
-	
-	apaga_quadrado(*Quadrado);
-	
-	switch (Quadrado->Direcao)
-	{
-		
-
-		case (CIMA):
-		
-	
-			if(Quadrado->Centro.Y - 2 == janela.PontoSE.Y)
-				Quadrado->Direcao = BAIXO;
-			else
-				Quadrado->Centro.Y = (Quadrado->Centro.Y) - 1 ;
-			
-			break;
-
-		case (BAIXO):
-			
-			
-			if(Quadrado->Centro.Y + 3 == janela.PontoID.Y)
-				Quadrado->Direcao = CIMA;
-			else
-				Quadrado->Centro.Y =(Quadrado->Centro.Y)+1;
-			
-			break;
-
-		case (ESQUERDA):
-			
-				
-			if(Quadrado->Centro.X - 2 == janela.PontoSE.X)
-				Quadrado->Direcao = DIREITA;
-			else
-				Quadrado->Centro.X = (Quadrado->Centro.X) - 1 ;
-			
-			break;
-		case (DIREITA):
-			
-				
-			if(Quadrado->Centro.X + 2 == janela.PontoID.X)
-				Quadrado->Direcao = ESQUERDA;
-			else
-				Quadrado->Centro.X = (Quadrado->Centro.X) + 1 ;
-			
-			break;
-	}
-
-	imprime_quadrado(*Quadrado);
-}
 
 /*		|---------------  Set ambiente -------------------------|
 		|	 Configura o console inicial ao mesmo tempo			|	
@@ -373,7 +499,7 @@ void set_console(CONSOLE *console, ATIVIDADE status)
 void cria_ambiente(AMBIENTE *Ambiente)
 {
 
-	int i;
+	int i, cor;
 
 	Ambiente->Quantidade = 1;
 	Ambiente->JanelaAtual = 0;
@@ -388,7 +514,7 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Janela[0].PontoID.X = Ambiente->Janela[0].PontoSE.X + Ambiente->Janela[0].Coluna;
 	Ambiente->Janela[0].PontoID.Y = Ambiente->Janela[0].PontoSE.Y + Ambiente->Janela[0].Linha; 
 
-	Ambiente->Janela[0].CorJanela = rand()%15 + 1; 
+	Ambiente->Janela[0].CorJanela = 1; 
 	Ambiente->Janela[0].JanelaAtual = FALSO;
 
 	/* -------------------- QUADRADOS SUPERIORES ------------------*/
@@ -402,7 +528,11 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
 		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-		Ambiente->Janela[i].CorJanela = rand()%15 + 1; 
+			
+		do{
+			cor = rand()%15 + 1;
+			Ambiente->Janela[i].CorJanela = cor; 
+		}while(cor == LIGHTGRAY);
 
 		Ambiente->Janela[i].JanelaAtual = FALSO;
 	}
@@ -420,7 +550,7 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 	Ambiente->Janela[5].JanelaAtual = FALSO;
 
-	Ambiente->Janela[5].CorJanela = rand()%15 + 1; 
+	Ambiente->Janela[5].CorJanela =  2; 
 	
 	for(i = 6; i < 10;++i)
 	{
@@ -432,7 +562,12 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
 		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-		Ambiente->Janela[i].CorJanela = rand()%15 + 1;
+		
+		do{
+			cor = rand()%15 + 1;
+			Ambiente->Janela[i].CorJanela = cor; 
+		}while(cor == LIGHTGRAY);
+
 		Ambiente->Janela[i].JanelaAtual = FALSO;
 	}
 
@@ -449,67 +584,7 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 }
 
-void apaga_quadrado(QUADRADO Quadrado){
 
-	int i,j;
-	
-
-	textbackground(BLACK);
-	for(i = 0; i < 3; ++i)
-	{
-		for(j = 0; j < 3; ++j)
-		{
-			gotoxy(Quadrado.Centro.X - 1 + j, Quadrado.Centro.Y - 1 + i);
-			putchar(BORDA_JANELA);
-		}
-	}
-
-}
-
-void gerencia_programa(AMBIENTE *Ambiente)
-{
-	int i,controle;	
-	EVENTO evento;
-	OQUEFAZER auxiliar;
-
-	i = controle = 0;
-
-	auxiliar = CONTINUAR;
-
-	gerencia_janela(Ambiente->Janela[0], Ambiente->Quadrado[0].Velocidade);
-
-
-	do
-	{	
-		/* operador ternario, substitui o if */
-		i = (i == 1000) ?  0 : i + 1;
-
-		if(hit(ALL))
-		{
-			evento = Evento();
-			auxiliar = le_teclas(evento, Ambiente);
-		}
-
-		if(auxiliar == REIPRIMIRJANELA)
-		{
-			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
-				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
-
-			auxiliar = CONTINUAR;
-		}
-
-		for(controle = 0; controle < Ambiente->Quantidade;++controle)
-		{	
-			if(i%Ambiente->Quadrado[controle].Velocidade == 0)
-				movimenta_quadrado(&Ambiente->Quadrado[controle],Ambiente->Janela[controle]);
-
-		}
-
-		++i;
-	
-	}while(auxiliar != ENCERRARPROGRAMA);
-
-}
 
 
 void depuracao(AMBIENTE Ambiente)
