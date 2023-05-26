@@ -130,6 +130,7 @@ typedef struct _quadrado
 	DIRECAO Direcao;
 	int Velocidade;
 	COORD Centro;
+	BOOLEANO QuadradoAtual;
 
 }QUADRADO;
 
@@ -147,7 +148,10 @@ typedef struct _ambiente
 /* #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# FIM DAS DECLARAÇÕES DAS VARIAVEIS E CONSTANTES #-#-#-#-#-#-#-#-#-#-#*/ 
 
 /* ################################## DECLARAÇÕES DE FUNCOES  ###########################################*/ 
-	
+
+
+BOOLEANO valida_janela(AMBIENTE, JANELA);
+
 /*	|---------------  imprime quadrado -----------------|
 	|	 	Funcao realizada a filtragem do evento 		|
 	|	e realiza funcao de acordo com o evento 		|
@@ -163,6 +167,7 @@ typedef struct _ambiente
 
 OQUEFAZER le_teclas(EVENTO,AMBIENTE *);
 
+void ajusta_quadrado(QUADRADO *, JANELA);
 
 /*	|---------------  imprime quadrado -----------------|
 	|	 	Funcao que recebe um quadrado e com suas 	|

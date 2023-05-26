@@ -69,7 +69,8 @@ void gerencia_programa(AMBIENTE *Ambiente)
 
 		/* caso o parametro de retorno seja o de REIMPRIMIR a janela ele entrara nesse if e ira realizar a impressao de todas as janeas novamente*/
 		if(auxiliar == REIPRIMIRJANELA)
-		{
+		{	
+			clrscr();
 			for(controle = 0; controle < Ambiente->Quantidade; ++controle)
 				gerencia_janela(Ambiente->Janela[controle], Ambiente->Quadrado[controle].Velocidade);
 
@@ -104,6 +105,41 @@ void gerencia_programa(AMBIENTE *Ambiente)
 	|	preta.											|
 	|---------------------------------------------------|
 */
+BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
+
+	int contador;
+
+	BOOLEANO Retorno;
+
+	/* A principio vamos assumir que a janela atual nao conlfita com nenhuma, e vamos procurar se ha algum caso falso para essa afirmacao*/
+	Retorno = VERDADEIRO;
+	/*funcao que ira validar se ha algum conflito entre as janelas passadas*/
+
+	/* 1o comparando as linhas com as colunas */
+
+	if(Janela.PontoID.X > Ambiente.PontoFinal.X || Janela.PontoID.Y > Ambiente.PontoFinal.Y)
+		return FALSO;
+
+	if(Janela.PontoSE.X > Ambiente.PontoFinal.X || Janela.PontoSE.Y > Ambiente.PontoFinal.Y)
+		return FALSO;
+
+	if(Janela.PontoSE.X < 1 || Janela.PontoSE.Y < 1 )
+		return FALSO;
+	
+	if(Janela.PontoSE.X < 1 || Janela.PontoSE.Y < 1 )
+		return FALSO;
+
+	for(contador = 0; contador < Ambiente.Quantidade; ++contador)
+	{
+
+		if(Janela.PontoSE.X < Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y < Ambiente.Janela[contador].PontoSE.Y)
+			if(Janela.PontoID.X > Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y > Ambiente.Janela[contador].PontoID.Y)
+				Retorno = FALSO;
+
+	}
+
+	return Retorno;
+}
 
 void apaga_quadrado(QUADRADO Quadrado)
 {
@@ -203,7 +239,11 @@ void imprime_quadrado(QUADRADO quadrado)
 {
 	int i, j; 
 	
-	textcolor(quadrado.CorQuadrado);
+	if(quadrado.QuadradoAtual)
+		textcolor(quadrado.CorQuadrado);
+	else
+		textcolor(LIGHTGRAY);
+
 	/* imprime como se fosse uma matriz*/
 	for(i = 0; i < 3 ;++i)
 	{
@@ -299,6 +339,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 	
 	int controle;
 	COORD Auxiliar;
+	JANELA JanelaAuxiliar;
 
 		if(evento.tipo_evento & KEY_EVENT)
 		{
@@ -311,11 +352,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 						
 						if(Ambiente->Quantidade < 10){
 							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 							/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
 							Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
 							Ambiente->JanelaAtual++;
 							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 							Ambiente->Quantidade++;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
 						}
 
 						return REIPRIMIRJANELA;
@@ -357,41 +400,137 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 					
 					/*-- aumenta area do quadrado externo para esquerda -- */
 					case F3:
-						return F3;
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoSE.X--;
+
+						JanelaAuxiliar.Coluna++;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
 					/*-- diminui a borda do quadrado da esquerda --*/ 							
 					case F4:
-						return F4;
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoSE.X++;
+						JanelaAuxiliar.Coluna--;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
 					
 					/*-- aumenta a area do quadrado para direita --*/
 					case F5:
-						return F5;
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoID.X++;
+						JanelaAuxiliar.Coluna++;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
 						
 					/*-- diminui a area da do quadrado para direita --*/
 					case F6: 
-						return F6;
-						
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoID.X--;
+						JanelaAuxiliar.Coluna--;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
+
 					/*-- aumenta a areda do quadrado para cima --*/
 					case F7:
-						return F6;
-							
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoSE.Y--;
+						JanelaAuxiliar.Linha++;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;	
 					/*-- diminui a area superior --*/ 
 					case F8:
-						return F8;
-						
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoSE.Y++;
+						JanelaAuxiliar.Linha--;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
+
 					/*-- aumenta a area para baixo --*/
 					case F9:
-						return F9;
-						
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoID.Y++;
+						JanelaAuxiliar.Linha++;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+
+						return REIPRIMIRJANELA;
 					/*--diminui a area para baixo --*/
 					case F10:
-						return F10;
-						
+
+						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
+
+						JanelaAuxiliar.PontoID.Y--;
+						JanelaAuxiliar.Linha--;
+
+						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
+						if(valida_janela(*Ambiente, JanelaAuxiliar))
+						{
+							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
+						}
+						return REIPRIMIRJANELA;
+
 					/*--alterna a cor do quadrado --*/
 					case CTRL:
 						return 0;
 						
 					/*-- alterna a cor do quadrado --*/
 					case TAB:
+						Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15 + 1; 
 						return TAB;
 
 					/*-- finaliza programa --*/
@@ -418,9 +557,11 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 					{
 						if((Ambiente->Janela[controle].PontoID.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y > Auxiliar.Y))
 						{
+						Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 						Ambiente->JanelaAtual = controle;
 						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+						Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
 						}
 					}
 
@@ -445,6 +586,30 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 		|	que estavam anteriormente							|
 		|-------------------------------------------------------|
 */
+void ajusta_quadrado(QUADRADO *Quadrado, JANELA Janela)
+{
+
+	if(Quadrado->Direcao == ESQUERDA || Quadrado->Direcao == DIREITA){
+		/* conflito na parte inferior da janela*/
+		if(Quadrado->Centro.Y >= Janela.PontoID.Y - 2)
+			Quadrado->Centro.Y--;
+
+		/*conlfito na parte superior da janela*/
+		if(Quadrado->Centro.Y  <= Janela.PontoSE.Y + 2)
+			Quadrado->Centro.Y++;
+	}
+
+	if(Quadrado->Direcao == CIMA || Quadrado->Direcao == BAIXO){
+		/* conflito na parte esquerda da janela */
+		if(Quadrado->Centro.X >= Janela.PontoSE.X - 2)
+			Quadrado->Centro.X++;
+		
+		/* conlfito com a parte direita horizontalmente */
+		if(Quadrado->Centro.X  <= Janela.PontoSE.X + 2)
+			Quadrado->Centro.X--;
+	}
+
+}
 
 void set_console(CONSOLE *console, ATIVIDADE status)
 {
@@ -515,7 +680,7 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Janela[0].PontoID.Y = Ambiente->Janela[0].PontoSE.Y + Ambiente->Janela[0].Linha; 
 
 	Ambiente->Janela[0].CorJanela = 1; 
-	Ambiente->Janela[0].JanelaAtual = FALSO;
+	Ambiente->Janela[0].JanelaAtual = VERDADEIRO;
 
 	/* -------------------- QUADRADOS SUPERIORES ------------------*/
 	for(i = 1; i < 5;++i)
@@ -578,7 +743,10 @@ void cria_ambiente(AMBIENTE *Ambiente)
 		Ambiente->Quadrado[i].Velocidade = rand()%1000;
 		Ambiente->Quadrado[i].Direcao = rand() %4;
 		Ambiente->Quadrado[i].CorQuadrado = rand()%15 + 1;
+		Ambiente->Quadrado[i].QuadradoAtual = FALSO;
 	}
+
+	Ambiente->Quadrado[0].QuadradoAtual = VERDADEIRO;
 
 	clrscr();
 

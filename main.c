@@ -17,7 +17,7 @@
 
 	REGRA DE ORDENACAO: as funcoes estao ordenadas alfabeticamente por TIPO DE RETORNO, caso haja duas funcoes com o mesmo tipo de retorno 
 	será ordenada alfabeticamente pelo NOME DA FUNCAO;
-	
+
 */
 #include <stdio.h> /*NULL*/
 #include <time.h> /* time() */ 
@@ -40,6 +40,8 @@ int main(int argc , char **argv)
 	set_console(&Console, ATIVAR);
 	
 	cria_ambiente(&Ambiente);
+
+	Ambiente.PontoFinal = Console.dimensao_maxima;
 
 	gerencia_programa(&Ambiente);
 	
