@@ -132,11 +132,27 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 	for(contador = 0; contador < Ambiente.Quantidade; ++contador)
 	{
 
-		if(Janela.PontoSE.X < Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y < Ambiente.Janela[contador].PontoSE.Y)
-			if(Janela.PontoID.X > Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y > Ambiente.Janela[contador].PontoID.Y)
-				Retorno = FALSO;
+		if(contador != Ambiente.JanelaAtual){
+			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
+			{
+					if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
+					{
 
+					Retorno = FALSO;
+					}
+			}
+			else
+			{
+				if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
+					if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoID.Y)
+						Retorno = FALSO;
+					
+			}
+		}
 	}
+
+	if(Janela.Linha < 5 || Janela.Coluna < 5)
+		return FALSO;
 
 	return Retorno;
 }
@@ -213,7 +229,7 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 	/*imprime a velocidade da janela */
 	textcolor(BLACK);
 	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
-	printf("Velocidade Quadrado: %d",Velocidade);
+	printf("V:%d",Velocidade);
 
 
 	textbackground(0);
@@ -335,7 +351,8 @@ void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
 	|-------------------------------------------------------|
 */
 
-OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
+OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
+{
 	
 	int controle;
 	COORD Auxiliar;
@@ -343,26 +360,31 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 
 		if(evento.tipo_evento & KEY_EVENT)
 		{
-			if(evento.teclado.status_tecla == LIBERADA)
+
+			if(evento.teclado.status_teclas_controle & LEFT_CTRL_PRESSED)
 			{
+				if(Ambiente->Quantidade < 10)
+				{
+					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+					/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
+					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
+					Ambiente->JanelaAtual++;
+					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+					Ambiente->Quantidade++;
+					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+				}
+				
+				return REIPRIMIRJANELA;
+			}
+			else if (evento.teclado.status_tecla == LIBERADA)
+			{
+				
 				switch(evento.teclado.codigo_tecla)
 				{
 					case ESPACO:
-						
-						
-						if(Ambiente->Quantidade < 10){
-							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-							/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
-							Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
-							Ambiente->JanelaAtual++;
-							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-							Ambiente->Quantidade++;
-							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-						}
-
+						Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
 						return REIPRIMIRJANELA;
-
 						break;
 
 					case F2:
@@ -537,11 +559,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 					case ESC:
 							return ENCERRARPROGRAMA;
 				}
-				
-			}
-
-
-			
+			}	
 		} 
 		else if(evento.tipo_evento & MOUSE_EVENT)
 		{
@@ -589,25 +607,18 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente){
 void ajusta_quadrado(QUADRADO *Quadrado, JANELA Janela)
 {
 
-	if(Quadrado->Direcao == ESQUERDA || Quadrado->Direcao == DIREITA){
+
 		/* conflito na parte inferior da janela*/
-		if(Quadrado->Centro.Y >= Janela.PontoID.Y - 2)
+	if(Quadrado->Centro.Y == (Janela.PontoID.Y - 2))
 			Quadrado->Centro.Y--;
+	else if(Quadrado->Centro.Y == Janela.PontoSE.Y + 1) /*conlfito na parte superior da janela*/
+		Quadrado->Centro.Y++;
 
-		/*conlfito na parte superior da janela*/
-		if(Quadrado->Centro.Y  <= Janela.PontoSE.Y + 2)
-			Quadrado->Centro.Y++;
-	}
-
-	if(Quadrado->Direcao == CIMA || Quadrado->Direcao == BAIXO){
 		/* conflito na parte esquerda da janela */
-		if(Quadrado->Centro.X >= Janela.PontoSE.X - 2)
-			Quadrado->Centro.X++;
-		
-		/* conlfito com a parte direita horizontalmente */
-		if(Quadrado->Centro.X  <= Janela.PontoSE.X + 2)
-			Quadrado->Centro.X--;
-	}
+	if(Quadrado->Centro.X == Janela.PontoSE.X + 1)
+		Quadrado->Centro.X++;
+	else if(Quadrado->Centro.X == Janela.PontoID.X - 1)/* conlfito com a parte direita horizontalmente */
+		Quadrado->Centro.X--;
 
 }
 
@@ -753,8 +764,6 @@ void cria_ambiente(AMBIENTE *Ambiente)
 }
 
 
-
-
 void depuracao(AMBIENTE Ambiente)
 {	
 	int i;
@@ -777,3 +786,5 @@ void depuracao(AMBIENTE Ambiente)
 
 	
 }
+
+void ordena_
