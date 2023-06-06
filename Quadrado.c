@@ -117,39 +117,53 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 
 	/* 1o comparando as linhas com as colunas */
 
+	/* Verificando se o ponto ID da janela se encotnra dentro do "Ambiente console", verificando se eles não são maiores que o ultimo ponto disponivel */
 	if(Janela.PontoID.X > Ambiente.PontoFinal.X || Janela.PontoID.Y > Ambiente.PontoFinal.Y)
 		return FALSO;
 
+	/* Verificando se o ponto se da janela se encotnra dentro do "Ambiente console", verificando se eles não são maiores que o ultimo ponto disponivel*/
 	if(Janela.PontoSE.X > Ambiente.PontoFinal.X || Janela.PontoSE.Y > Ambiente.PontoFinal.Y)
 		return FALSO;
 
+	/* verificando se as coordeadas naão são menores que o ponto inicial */
 	if(Janela.PontoSE.X < 1 || Janela.PontoSE.Y < 1 )
 		return FALSO;
 	
+	/* verificando se as coordeadas naão são menores que o ponto inicial */
 	if(Janela.PontoSE.X < 1 || Janela.PontoSE.Y < 1 )
 		return FALSO;
 
-	for(contador = 0; contador < Ambiente.Quantidade; ++contador)
+	contador = 0; 
+	do/*(contador = 0; contador < Ambiente.Quantidade; ++contador)*/
 	{
 
-		if(contador != Ambiente.JanelaAtual){
-			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
-			{
-					if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
-					{
+		/* ------- Precisamos verificar se alguns dos quatro pontos da janela não estão conflitando com alguem */
 
+			/* ponto superior esquerdo */
+			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
+				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y <= Ambiente.Janela[contador].PontoID.Y)
 					Retorno = FALSO;
-					}
-			}
-			else
-			{
-				if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
-					if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoID.Y)
-						Retorno = FALSO;
-					
-			}
-		}
-	}
+
+			/* ponto "inferior" esquerdo, essse ponto não existe então vamos simular dentro da condicional */
+			/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
+			if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
+				if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y <= Ambiente.Janela[contador].PontoID.Y)
+					Retorno = FALSO;
+
+			/*ponto inferior direito*/
+			if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
+				if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
+					Retorno = FALSO;
+
+			/*ponto "superior" direito,  essse ponto não existe então vamos simular dentro da condicional*/
+			/*a formacao desse ponto é composta por Y do ponto ID e X do ponto SE*/
+			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
+				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
+					Retorno = FALSO;
+
+	contador++;
+
+	}while(contador < Ambiente.Quantidade);	
 
 	if(Janela.Linha < 5 || Janela.Coluna < 5)
 		return FALSO;
@@ -365,14 +379,19 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 			{
 				if(Ambiente->Quantidade < 10)
 				{
+					/*
 					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-					/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
-					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
+					Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
+					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;
 					Ambiente->JanelaAtual++;
 					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 					Ambiente->Quantidade++;
 					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+					*/
+
+					adiciona_quadrado(Ambiente);
+
 				}
 				
 				return REIPRIMIRJANELA;
@@ -675,8 +694,6 @@ void set_console(CONSOLE *console, ATIVIDADE status)
 void cria_ambiente(AMBIENTE *Ambiente)
 {
 
-	int i, cor;
-
 	Ambiente->Quantidade = 1;
 	Ambiente->JanelaAtual = 0;
 
@@ -693,7 +710,16 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Janela[0].CorJanela = 1; 
 	Ambiente->Janela[0].JanelaAtual = VERDADEIRO;
 
+	Ambiente->Quadrado[0].Centro.X = Ambiente->Janela[0].PontoID.X - Ambiente->Janela[0].Coluna / 2;
+	Ambiente->Quadrado[0].Centro.Y = Ambiente->Janela[0].PontoID.Y - Ambiente->Janela[0].Linha / 2;
+	Ambiente->Quadrado[0].Velocidade = rand()%1000;
+	Ambiente->Quadrado[0].Direcao = rand() %4;
+	Ambiente->Quadrado[0].CorQuadrado = rand()%15 + 1;		
+	Ambiente->Quadrado[0].QuadradoAtual = FALSO;
+	Ambiente->Quadrado[0].QuadradoAtual = VERDADEIRO;
+
 	/* -------------------- QUADRADOS SUPERIORES ------------------*/
+	/*
 	for(i = 1; i < 5;++i)
 	{
 		Ambiente->Janela[i].PontoSE.X = Ambiente->Janela[i-1].PontoID.X + 2;
@@ -712,9 +738,9 @@ void cria_ambiente(AMBIENTE *Ambiente)
 
 		Ambiente->Janela[i].JanelaAtual = FALSO;
 	}
-
+	*/
 	/*---------------------- QUADRADOS INFERIORES ---------------------*/
-
+	/*
 	Ambiente->Janela[5].PontoSE.X = Ambiente->Janela[0].PontoSE.X;
 	Ambiente->Janela[5].PontoSE.Y = Ambiente->Janela[0].PontoID.Y + 2 ; 
 
@@ -756,8 +782,7 @@ void cria_ambiente(AMBIENTE *Ambiente)
 		Ambiente->Quadrado[i].CorQuadrado = rand()%15 + 1;
 		Ambiente->Quadrado[i].QuadradoAtual = FALSO;
 	}
-
-	Ambiente->Quadrado[0].QuadradoAtual = VERDADEIRO;
+	*/
 
 	clrscr();
 
@@ -787,4 +812,81 @@ void depuracao(AMBIENTE Ambiente)
 	
 }
 
-void ordena_
+void adiciona_quadrado(AMBIENTE *Ambiente)
+{
+	JANELA JanelaAuxiliar; 
+	BOOLEANO controle; 
+
+	JanelaAuxiliar.Linha = LINHA;
+	JanelaAuxiliar.Coluna = COLUNA;
+
+	JanelaAuxiliar.PontoSE.X = 1;
+	JanelaAuxiliar.PontoSE.Y = 1;
+
+	JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+	JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
+
+	
+	while(JanelaAuxiliar.Linha > 5 || JanelaAuxiliar.Coluna > 5)
+	{
+		controle = FALSO;
+
+		/* andando com a janela auxiliar na vertical */
+		while(JanelaAuxiliar.PontoID.Y < Ambiente->PontoFinal.Y)
+		{
+			/*andando com a janela na horixontal*/
+			while(JanelaAuxiliar.PontoID.X <= Ambiente->PontoFinal.X)
+			{
+				controle = valida_janela(*Ambiente,JanelaAuxiliar);
+
+				if(controle)
+					break;
+
+				JanelaAuxiliar.PontoSE.X++;
+				JanelaAuxiliar.PontoID.X++;
+			}
+
+			if(controle)
+				break;
+
+			JanelaAuxiliar.PontoID.Y++;
+			JanelaAuxiliar.PontoSE.Y++;
+			JanelaAuxiliar.PontoSE.X=1;
+			JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+		}
+
+		if(controle)
+			break;
+
+		JanelaAuxiliar.Linha--;
+		JanelaAuxiliar.Coluna--;
+
+		JanelaAuxiliar.PontoSE.X = 1;
+		JanelaAuxiliar.PontoSE.Y = 1;
+
+		JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+		JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
+	}
+
+	if(controle)
+	{
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+					/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
+					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
+		Ambiente->JanelaAtual++;
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+		Ambiente->Quantidade++;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+
+		/* COLCOANDO VALORES NA JANELA CRIADA */
+		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15+1;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = rand()%4;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade = rand()%1000;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.X = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.X - Ambiente->Janela[Ambiente->JanelaAtual].Coluna / 2;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.Y = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.Y - Ambiente->Janela[Ambiente->JanelaAtual].Linha / 2;
+	}
+
+}

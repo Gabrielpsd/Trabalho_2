@@ -51,10 +51,7 @@ typedef enum
 	VERDADEIRO
 }BOOLEANO;
 
-typedef enum
-{
-	ORDENA_
-}
+
 /*	|---------------- OQUEFAZER  ---------------------------|
 	|		Esse eh um tipo de dado criado exclusivamente	|
 	|	para a funcao le_teclas, pois assim que sair 		|
@@ -267,6 +264,8 @@ void depuracao(AMBIENTE);
 
 void executa_acao(int);
 
+void ordena_janelas(AMBIENTE *);
 
+void adiciona_quadrado(AMBIENTE *);
 
 #endif /* quadradoAnimado */ 
