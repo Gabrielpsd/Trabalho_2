@@ -245,7 +245,12 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
 	printf("V:%d",Velocidade);
 
-
+	if(Janela.JanelaAtual == VERDADEIRO)
+	{
+		gotoxy(Janela.PontoSE.X,Janela.PontoSE.Y);
+		textcolor(BLACK);
+		printf("Atual");
+	}
 	textbackground(0);
 }
 
@@ -442,6 +447,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- aumenta area do quadrado externo para esquerda -- */
 					case F3:
 
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X--;
@@ -454,10 +460,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 					/*-- diminui a borda do quadrado da esquerda --*/ 							
 					case F4:
 
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X++;
@@ -469,11 +477,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 					
 					/*-- aumenta a area do quadrado para direita --*/
 					case F5:
 
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X++;
@@ -485,11 +495,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 						
 					/*-- diminui a area da do quadrado para direita --*/
 					case F6: 
 
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X--;
@@ -501,10 +513,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 
 					/*-- aumenta a areda do quadrado para cima --*/
 					case F7:
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y--;
@@ -516,10 +530,11 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;	
 					/*-- diminui a area superior --*/ 
 					case F8:
-
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y++;
@@ -531,11 +546,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 
 					/*-- aumenta a area para baixo --*/
 					case F9:
-
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y++;
@@ -547,11 +563,11 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 					/*--diminui a area para baixo --*/
 					case F10:
-
+						Ambiente->Quantidade--;
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y--;
@@ -563,6 +579,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
+						Ambiente->Quantidade++;
 						return REIPRIMIRJANELA;
 
 					/*--alterna a cor do quadrado --*/
@@ -869,16 +886,17 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 	}
 
 	if(controle)
-	{
+	{	
 		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 					/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
 					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
 		Ambiente->JanelaAtual++;
+		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 		Ambiente->Quantidade++;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+		
 
 		/* COLCOANDO VALORES NA JANELA CRIADA */
 		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
