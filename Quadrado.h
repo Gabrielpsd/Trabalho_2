@@ -140,7 +140,7 @@ typedef struct _ambiente
 	QUADRADO Quadrado[QUANTIDADE];
 	JANELA Janela[QUANTIDADE];
 	
-	int AreaTotal, Quantidade, AreaOucupada;
+	int Quantidade;
 	COORD PontoInicial, PontoFinal; 
 	BOLADAVEZ JanelaAtual;
 }AMBIENTE;
@@ -259,8 +259,6 @@ void set_console(CONSOLE *, ATIVIDADE);
 /* ------------------------------- implementações da nova versão ---------------------------------*/
 
 void cria_ambiente(AMBIENTE *);
-
-void depuracao(AMBIENTE);
 
 void executa_acao(int);
 

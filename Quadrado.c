@@ -138,7 +138,8 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 	{
 
 		/* ------- Precisamos verificar se alguns dos quatro pontos da janela não estão conflitando com alguem */
-
+		if(Janela.JanelaAtual == FALSO)
+		{
 			/* ponto superior esquerdo */
 			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
 				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y <= Ambiente.Janela[contador].PontoID.Y)
@@ -160,6 +161,7 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
 				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
 					Retorno = FALSO;
+		}
 
 	contador++;
 
@@ -383,21 +385,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 			if(evento.teclado.status_teclas_controle & LEFT_CTRL_PRESSED)
 			{
 				if(Ambiente->Quantidade < 10)
-				{
-					/*
-					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-					Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
-					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;
-					Ambiente->JanelaAtual++;
-					Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-					Ambiente->Quantidade++;
-					Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-					*/
-
 					adiciona_quadrado(Ambiente);
-
-				}
 				
 				return REIPRIMIRJANELA;
 			}
@@ -735,104 +723,15 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Quadrado[0].QuadradoAtual = FALSO;
 	Ambiente->Quadrado[0].QuadradoAtual = VERDADEIRO;
 
-	/* -------------------- QUADRADOS SUPERIORES ------------------*/
-	/*
-	for(i = 1; i < 5;++i)
-	{
-		Ambiente->Janela[i].PontoSE.X = Ambiente->Janela[i-1].PontoID.X + 2;
-		Ambiente->Janela[i].PontoSE.Y = Ambiente->Janela[i-1].PontoSE.Y; 
-
-		Ambiente->Janela[i].Linha = LINHA;
-		Ambiente->Janela[i].Coluna = COLUNA;
-
-		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
-		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-			
-		do{
-			cor = rand()%15 + 1;
-			Ambiente->Janela[i].CorJanela = cor; 
-		}while(cor == LIGHTGRAY);
-
-		Ambiente->Janela[i].JanelaAtual = FALSO;
-	}
-	*/
-	/*---------------------- QUADRADOS INFERIORES ---------------------*/
-	/*
-	Ambiente->Janela[5].PontoSE.X = Ambiente->Janela[0].PontoSE.X;
-	Ambiente->Janela[5].PontoSE.Y = Ambiente->Janela[0].PontoID.Y + 2 ; 
-
-	Ambiente->Janela[5].Linha = LINHA;
-	Ambiente->Janela[5].Coluna = COLUNA;
-
-	Ambiente->Janela[5].PontoID.X = Ambiente->Janela[5].PontoSE.X + Ambiente->Janela[5].Coluna;
-	Ambiente->Janela[5].PontoID.Y = Ambiente->Janela[5].PontoSE.Y + Ambiente->Janela[5].Linha; 
-
-	Ambiente->Janela[5].JanelaAtual = FALSO;
-
-	Ambiente->Janela[5].CorJanela =  2; 
-	
-	for(i = 6; i < 10;++i)
-	{
-		Ambiente->Janela[i].PontoSE.X = Ambiente->Janela[i-1].PontoID.X + 2;
-		Ambiente->Janela[i].PontoSE.Y = Ambiente->Janela[i-1].PontoSE.Y; 
-
-		Ambiente->Janela[i].Linha = LINHA;
-		Ambiente->Janela[i].Coluna = COLUNA;
-
-		Ambiente->Janela[i].PontoID.X = Ambiente->Janela[i].PontoSE.X + Ambiente->Janela[i].Coluna;
-		Ambiente->Janela[i].PontoID.Y = Ambiente->Janela[i].PontoSE.Y + Ambiente->Janela[i].Linha; 
-		
-		do{
-			cor = rand()%15 + 1;
-			Ambiente->Janela[i].CorJanela = cor; 
-		}while(cor == LIGHTGRAY);
-
-		Ambiente->Janela[i].JanelaAtual = FALSO;
-	}
-
-	for(i = 0; i < 10; ++i)
-	{
-		Ambiente->Quadrado[i].Centro.X = Ambiente->Janela[i].PontoID.X - Ambiente->Janela[i].Coluna / 2;
-		Ambiente->Quadrado[i].Centro.Y = Ambiente->Janela[i].PontoID.Y - Ambiente->Janela[i].Linha / 2;
-		Ambiente->Quadrado[i].Velocidade = rand()%1000;
-		Ambiente->Quadrado[i].Direcao = rand() %4;
-		Ambiente->Quadrado[i].CorQuadrado = rand()%15 + 1;
-		Ambiente->Quadrado[i].QuadradoAtual = FALSO;
-	}
-	*/
-
 	clrscr();
 
-}
-
-
-void depuracao(AMBIENTE Ambiente)
-{	
-	int i;
-	for(i = 9; i < 10; ++i)
-	{
-		
-		printf(" --------------- %do janela -------------------\n ", i+1);
-		printf("Diagonal superior esquerda: X = %d e Y = %d \n ",Ambiente.Janela[i].PontoSE.X,Ambiente.Janela[i].PontoSE.Y);
-		printf("Diagonal inferior direita: X = %d e Y = %d \n ",Ambiente.Janela[i].PontoID.X,Ambiente.Janela[i].PontoID.Y);
-		printf("Linha = %d e coluna = %d \n ",Ambiente.Janela[i].Linha,Ambiente.Janela[i].Coluna);
-		printf("Cor = %d \n ",Ambiente.Janela[i].CorJanela);
-
-		printf("     -> QUADRADO: \n\n");
-		printf("\tCentro: X = %d e Y = %d \n ",Ambiente.Quadrado[i].Centro.X,Ambiente.Quadrado[i].Centro.Y);
-		printf("\tVelocidade: X = %d Direcao = %d \n ",Ambiente.Quadrado[i].Velocidade,Ambiente.Quadrado[i].Direcao);
-		printf(" --------------- ---------  -------------------\n ");
-
-		getchar();
-	}
-
-	
 }
 
 void adiciona_quadrado(AMBIENTE *Ambiente)
 {
 	JANELA JanelaAuxiliar; 
-	BOOLEANO controle; 
+	BOOLEANO controle;
+	int i, auxiliar; 
 
 	JanelaAuxiliar.Linha = LINHA;
 	JanelaAuxiliar.Coluna = COLUNA;
@@ -873,7 +772,34 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 		}
 
 		if(controle)
-			break;
+		{	
+			auxiliar = Ambiente->JanelaAtual;
+			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+			Ambiente->JanelaAtual = ++Ambiente->Quantidade-1;
+			/*Ambiente->Quantidade++;*/
+			Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+			
+			for(i = 0; i < Ambiente->Quantidade ; ++i)
+			{
+				controle = valida_janela(*Ambiente,Ambiente->Janela[i]);
+				
+				if(!controle)
+					break;
+			}
+			
+
+			if(controle)
+				break;
+
+			Ambiente->Quantidade--;
+			Ambiente->JanelaAtual=auxiliar;
+			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+
+		}
 
 		JanelaAuxiliar.Linha--;
 		JanelaAuxiliar.Coluna--;
@@ -887,16 +813,6 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 
 	if(controle)
 	{	
-		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-					/*Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = DARKGRAY;
-					Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = DARKGRAY;*/
-		Ambiente->JanelaAtual++;
-		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
-		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-		Ambiente->Quantidade++;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-		
 
 		/* COLCOANDO VALORES NA JANELA CRIADA */
 		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
