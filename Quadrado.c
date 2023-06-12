@@ -13,8 +13,8 @@ setDimensaoJanela() ,setTituloConsole() ,setCursorStatus(),Sleep() */
 ela somasse a posicao do ponto apenas para poder imprimir em determinado local da tela(no canto inferior esquerdo nesse caso)
 */
 
-#define LINHA 18
-#define COLUNA 31
+#define LINHA 30
+#define COLUNA 40
 #define VELOCIDADE 100 /*dada em milisegundos */ 
 #define CARACTER_HORIZONTAL 32
 #define CARACTER_VERTICAL 32
@@ -107,7 +107,7 @@ void gerencia_programa(AMBIENTE *Ambiente)
 */
 BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 
-	int contador;
+	int contador, i , j ;
 
 	BOOLEANO Retorno;
 
@@ -134,38 +134,38 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 		return FALSO;
 
 	contador = 0; 
+	
 	do/*(contador = 0; contador < Ambiente.Quantidade; ++contador)*/
 	{
+		i = 0;
 
-		/* ------- Precisamos verificar se alguns dos quatro pontos da janela não estão conflitando com alguem */
-		if(Janela.JanelaAtual == FALSO)
+		while (i < Janela.Linha)
 		{
-			/* ponto superior esquerdo */
-			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
-				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y <= Ambiente.Janela[contador].PontoID.Y)
-					Retorno = FALSO;
+			j = 0;
+			while(j < Janela.Coluna)
+			{
+				/* ------- Precisamos verificar se alguns dos quatro pontos da janela não estão conflitando com alguem */
+				if(Ambiente.Janela[contador].JanelaAtual == FALSO)
+				{
 
-			/* ponto "inferior" esquerdo, essse ponto não existe então vamos simular dentro da condicional */
-			/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
-			if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y >= Ambiente.Janela[contador].PontoSE.Y)
-				if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y <= Ambiente.Janela[contador].PontoID.Y)
-					Retorno = FALSO;
+					/* ponto superior esquerdo */
+					if(Janela.PontoSE.X + j >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y + i >= Ambiente.Janela[contador].PontoSE.Y)
+						if(Janela.PontoSE.X + j <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y + i <= Ambiente.Janela[contador].PontoID.Y)
+							Retorno = FALSO;
 
-			/*ponto inferior direito*/
-			if(Janela.PontoID.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
-				if(Janela.PontoID.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
-					Retorno = FALSO;
+			
+				}
 
-			/*ponto "superior" direito,  essse ponto não existe então vamos simular dentro da condicional*/
-			/*a formacao desse ponto é composta por Y do ponto ID e X do ponto SE*/
-			if(Janela.PontoSE.X >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoID.Y >= Ambiente.Janela[contador].PontoSE.Y)
-				if(Janela.PontoSE.X <= Ambiente.Janela[contador].PontoID.X && Janela.PontoID.Y <= Ambiente.Janela[contador].PontoID.Y)
-					Retorno = FALSO;
+				++j;
+			}
+
+			++i;
 		}
 
 	contador++;
 
 	}while(contador < Ambiente.Quantidade);	
+
 
 	if(Janela.Linha < 5 || Janela.Coluna < 5)
 		return FALSO;
@@ -435,7 +435,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- aumenta area do quadrado externo para esquerda -- */
 					case F3:
 
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X--;
@@ -448,12 +448,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 					/*-- diminui a borda do quadrado da esquerda --*/ 							
 					case F4:
 
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X++;
@@ -465,13 +465,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 					
 					/*-- aumenta a area do quadrado para direita --*/
 					case F5:
 
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X++;
@@ -483,13 +483,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 						
 					/*-- diminui a area da do quadrado para direita --*/
 					case F6: 
 
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X--;
@@ -501,12 +501,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 
 					/*-- aumenta a areda do quadrado para cima --*/
 					case F7:
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y--;
@@ -518,11 +518,11 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;	
 					/*-- diminui a area superior --*/ 
 					case F8:
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y++;
@@ -534,12 +534,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 
 					/*-- aumenta a area para baixo --*/
 					case F9:
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y++;
@@ -551,11 +551,11 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 					/*--diminui a area para baixo --*/
 					case F10:
-						Ambiente->Quantidade--;
+						
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y--;
@@ -567,7 +567,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
-						Ambiente->Quantidade++;
+						
 						return REIPRIMIRJANELA;
 
 					/*--alterna a cor do quadrado --*/
@@ -720,7 +720,6 @@ void cria_ambiente(AMBIENTE *Ambiente)
 	Ambiente->Quadrado[0].Velocidade = rand()%1000;
 	Ambiente->Quadrado[0].Direcao = rand() %4;
 	Ambiente->Quadrado[0].CorQuadrado = rand()%15 + 1;		
-	Ambiente->Quadrado[0].QuadradoAtual = FALSO;
 	Ambiente->Quadrado[0].QuadradoAtual = VERDADEIRO;
 
 	clrscr();
@@ -733,8 +732,8 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 	BOOLEANO controle;
 	int i, auxiliar; 
 
-	JanelaAuxiliar.Linha = LINHA;
-	JanelaAuxiliar.Coluna = COLUNA;
+	JanelaAuxiliar.Linha = rand()%LINHA + 10;
+	JanelaAuxiliar.Coluna = rand()% COLUNA + 10;
 
 	JanelaAuxiliar.PontoSE.X = 1;
 	JanelaAuxiliar.PontoSE.Y = 1;
@@ -742,10 +741,15 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 	JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
 	JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
 
+	auxiliar = Ambiente->JanelaAtual;
+	Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+	Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 	
-	while(JanelaAuxiliar.Linha > 5 || JanelaAuxiliar.Coluna > 5)
+
+	while(JanelaAuxiliar.Linha > 5 && JanelaAuxiliar.Coluna > 5)
 	{
-		controle = FALSO;
+		controle = VERDADEIRO;
+		
 
 		/* andando com a janela auxiliar na vertical */
 		while(JanelaAuxiliar.PontoID.Y < Ambiente->PontoFinal.Y)
@@ -753,7 +757,17 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 			/*andando com a janela na horixontal*/
 			while(JanelaAuxiliar.PontoID.X <= Ambiente->PontoFinal.X)
 			{
-				controle = valida_janela(*Ambiente,JanelaAuxiliar);
+					i = 0;
+
+					while (i < Ambiente->Quantidade)
+					{	
+							controle = Verifica_janelas2(JanelaAuxiliar ,Ambiente->Janela[i]);
+							++i;
+
+							if(controle == FALSO)
+								break;
+
+					}
 
 				if(controle)
 					break;
@@ -772,34 +786,7 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 		}
 
 		if(controle)
-		{	
-			auxiliar = Ambiente->JanelaAtual;
-			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-			Ambiente->JanelaAtual = ++Ambiente->Quantidade-1;
-			/*Ambiente->Quantidade++;*/
-			Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
-			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-			
-			for(i = 0; i < Ambiente->Quantidade ; ++i)
-			{
-				controle = valida_janela(*Ambiente,Ambiente->Janela[i]);
-				
-				if(!controle)
-					break;
-			}
-			
-
-			if(controle)
-				break;
-
-			Ambiente->Quantidade--;
-			Ambiente->JanelaAtual=auxiliar;
-			Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-			Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-
-		}
+			break;
 
 		JanelaAuxiliar.Linha--;
 		JanelaAuxiliar.Coluna--;
@@ -809,18 +796,177 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 
 		JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
 		JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
+
 	}
 
-	if(controle)
-	{	
+	if(controle == FALSO)
+	{
 
-		/* COLCOANDO VALORES NA JANELA CRIADA */
+		Ambiente->JanelaAtual=auxiliar;
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+
+	}
+		else if(controle)
+	{	
+		
+		++Ambiente->Quantidade;
+		Ambiente->JanelaAtual = Ambiente->Quantidade-1;
+		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15+1;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = rand()%4;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade = rand()%1000;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.X = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.X - Ambiente->Janela[Ambiente->JanelaAtual].Coluna / 2;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.Y = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.Y - Ambiente->Janela[Ambiente->JanelaAtual].Linha / 2;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
 	}
 
+}
+
+BOOLEANO Verifica_janelas(JANELA Janela1, JANELA Janela2)
+{	
+	BOOLEANO Retorno;
+	int i, j;
+
+	Retorno = VERDADEIRO;
+
+	/* verificando se a janela 1 esta contida na janela 2 */
+		/* ponto superior esquerdo */
+		if(Janela1.PontoSE.X >= Janela2.PontoSE.X && Janela1.PontoSE.Y >= Janela2.PontoSE.Y)
+			if(Janela1.PontoSE.X <= Janela2.PontoID.X && Janela1.PontoSE.Y <= Janela2.PontoID.Y)
+				Retorno = FALSO;
+
+	/* ponto "inferior" esquerdo, essse ponto não existe então vamos simular dentro da condicional */
+	/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
+		if(Janela1.PontoSE.X >= Janela2.PontoSE.X && Janela1.PontoID.Y >= Janela2.PontoSE.Y)
+			if(Janela1.PontoSE.X <= Janela2.PontoID.X && Janela1.PontoID.Y <= Janela2.PontoID.Y)
+				Retorno = FALSO;
+
+	/*ponto inferior direito*/
+		if(Janela1.PontoID.X >= Janela2.PontoSE.X && Janela1.PontoID.Y >= Janela2.PontoSE.Y)
+			if(Janela1.PontoID.X <= Janela2.PontoID.X && Janela1.PontoID.Y <= Janela2.PontoID.Y)
+				Retorno = FALSO;
+
+	/* ponto "superior" direito, essse ponto não existe então vamos simular dentro da condicional */
+	/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
+		if(Janela1.PontoID.X >= Janela2.PontoSE.X && Janela1.PontoSE.Y >= Janela2.PontoSE.Y)
+			if(Janela1.PontoID.X <= Janela2.PontoID.X && Janela1.PontoSE.Y <= Janela2.PontoID.Y)
+				Retorno = FALSO;
+
+
+	/* verificando se a jane a2 esta contidoa em janela 1*/
+
+/* verificando se a janela 1 esta contida na janela 2 */
+		/* ponto superior esquerdo */
+		if(Janela2.PontoSE.X >= Janela1.PontoSE.X && Janela2.PontoSE.Y >= Janela1.PontoSE.Y)
+			if(Janela2.PontoSE.X <= Janela1.PontoID.X && Janela2.PontoSE.Y <= Janela1.PontoID.Y)
+				Retorno = FALSO;
+
+	/* ponto "inferior" esquerdo, essse ponto não existe então vamos simular dentro da condicional */
+	/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
+		if(Janela2.PontoSE.X >= Janela1.PontoSE.X && Janela2.PontoID.Y >= Janela1.PontoSE.Y)
+			if(Janela2.PontoSE.X <= Janela1.PontoID.X && Janela2.PontoID.Y <= Janela1.PontoID.Y)
+				Retorno = FALSO;
+
+	/*ponto inferior direito*/
+		if(Janela2.PontoID.X >= Janela1.PontoSE.X && Janela2.PontoID.Y >= Janela1.PontoSE.Y)
+			if(Janela2.PontoID.X <= Janela1.PontoID.X && Janela2.PontoID.Y <= Janela1.PontoID.Y)
+				Retorno = FALSO;
+
+	/* ponto "superior" direito, essse ponto não existe então vamos simular dentro da condicional */
+	/*a formacao desse ponto é composta por Y do ponto SE e X do ponto ID*/
+		if(Janela2.PontoID.X >= Janela1.PontoSE.X && Janela2.PontoSE.Y >= Janela1.PontoSE.Y)
+			if(Janela2.PontoID.X <= Janela1.PontoID.X && Janela2.PontoSE.Y <= Janela1.PontoID.Y)
+				Retorno = FALSO;
+
+	i = j = 0;
+
+	/* VERIFICANDO SE ALGUMA LINHA DA JANELA 1 ESTA CONFLITANDO COM A JANELA 2 */
+	while(Janela1.Coluna > i)
+	{
+		while(Janela2.Linha > j)
+		{
+			
+			if(Janela1.PontoSE.X + i == Janela2.PontoSE.Y + j )
+				Retorno = FALSO;
+			
+			if(Janela1.PontoID.X - LINHA + i == Janela2.PontoSE.Y + j )
+				Retorno = FALSO;
+
+			++j;
+		}
+
+		++i;
+	}
+
+	/* VERIFICANDO SE ALGUMA COLUNA DA JANEA 1 ESTA CONFLITANTO COM A JANELA 2 */
+
+	i = j = 0;
+
+	while(Janela1.Coluna > i)
+	{
+		while(Janela2.Linha > j)
+		{
+			
+			if(Janela1.PontoSE.Y + i == Janela2.PontoSE.Y + j )
+				Retorno = FALSO;
+			
+			if(Janela1.PontoID.Y - COLUNA + i == Janela2.PontoSE.Y + j )
+				Retorno = FALSO;
+
+			++j;
+		}
+
+		++i;
+	}
+
+	return Retorno;
+	
+}
+
+BOOLEANO Verifica_janelas2(JANELA Janela1, JANELA Janela2)
+{	
+	BOOLEANO Retorno; 
+	int i, j ; 
+
+	i = 0;
+
+	Retorno = VERDADEIRO;
+
+	while(i < Janela1.Linha)
+	{	
+		j = 0;
+
+		while( j < Janela1.Coluna)
+		{
+			if(Janela1.PontoSE.X + j >= Janela2.PontoSE.X && Janela1.PontoSE.Y + i >= Janela2.PontoSE.Y)
+				if(Janela1.PontoSE.X + j  <= Janela2.PontoID.X && Janela1.PontoSE.Y + i <= Janela2.PontoID.Y)
+					Retorno = FALSO;
+			
+			++j;
+		}
+
+		++i;
+	}
+
+	i = 0;
+
+	while(i < Janela2.Linha)
+	{	
+		j = 0;
+
+		while( j < Janela2.Coluna)
+		{
+			if(Janela2.PontoSE.X + j >= Janela1.PontoSE.X && Janela2.PontoSE.Y + i >= Janela1.PontoSE.Y)
+				if(Janela2.PontoSE.X + j  <= Janela1.PontoID.X && Janela2.PontoSE.Y + i <= Janela1.PontoID.Y)
+					Retorno = FALSO;
+			++j;
+		}
+
+		++i;
+	}
+
+	return Retorno;
 }

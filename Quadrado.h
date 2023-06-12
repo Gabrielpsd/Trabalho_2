@@ -21,7 +21,6 @@
 	|---------------------------------------------------|
 */
 typedef enum controle{
-	NENHUMA = -1,
 	JANELA1 = 0,
 	JANELA2,
 	JANELA3,
@@ -152,6 +151,8 @@ typedef struct _ambiente
 
 BOOLEANO valida_janela(AMBIENTE, JANELA);
 
+
+BOOLEANO Verifica_janelas(JANELA , JANELA);
 /*	|---------------  imprime quadrado -----------------|
 	|	 	Funcao realizada a filtragem do evento 		|
 	|	e realiza funcao de acordo com o evento 		|
@@ -265,5 +266,7 @@ void executa_acao(int);
 void ordena_janelas(AMBIENTE *);
 
 void adiciona_quadrado(AMBIENTE *);
+
+BOOLEANO Verifica_janelas2(JANELA , JANELA );
 
 #endif /* quadradoAnimado */ 
