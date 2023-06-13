@@ -38,10 +38,14 @@ int main(int argc , char **argv)
 	srand(time(NULL));
 	
 	set_console(&Console, ATIVAR);
-	
-	cria_ambiente(&Ambiente);
 
 	Ambiente.PontoFinal = Console.dimensao_maxima;
+	Ambiente.Quantidade = 0;
+	Ambiente.JanelaAtual = 0;
+	adiciona_quadrado(&Ambiente);
+	clrscr();
+
+	gerencia_janela(Ambiente.Janela[0], Ambiente.Quadrado[0].Velocidade);
 
 	gerencia_programa(&Ambiente);
 	
