@@ -610,6 +610,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 				{
 					if((Ambiente->Janela[controle].PontoSE.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y < Auxiliar.Y))
 					{
+						/* caso a coordenada retornada por Evento esteja no meio de alguma janela, essa se tornara a janela principal*/
 						if((Ambiente->Janela[controle].PontoID.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y > Auxiliar.Y))
 						{
 						Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
@@ -631,6 +632,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 		return 1; 
 }
 
+/*		|---------------  Ajusta quadrado ----------------------|
+		|	 	Essa função é chamada quando há a movimentação	|
+		|	da janela externa, a funcao recebe o ambiente para 	|
+		|	pegar a janela atual e movimentar o quadrado interno|
+		|	caso ele esteja ulptrapassando alguma borda 		|
+		|-------------------------------------------------------|
+*/
 
 void ajusta_quadrado(QUADRADO *Quadrado, JANELA Janela)
 {
@@ -741,14 +749,17 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 	JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
 	JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
 	JanelaAuxiliar.JanelaAtual = VERDADEIRO;
-	/**/
+	
+	/*definindo a janela atual como sendo a falsa a ser considerada no programa*/
 	auxiliar = Ambiente->JanelaAtual;
 	Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 	Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 	
-
+	/* quando eu tiver uam janela menor que 5x5 ela nao tera capacidade de armazenar um quadrado, logo não há necessidade de continuar tentando 
+	colocar mais janelas no programa*/
 	while(JanelaAuxiliar.Linha > 5 && JanelaAuxiliar.Coluna > 5)
-	{
+	{	
+		/*chute inicial, assume-se que é válida e verifica se algum valor é inválido */
 		controle = VERDADEIRO;
 		
 
@@ -776,6 +787,7 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 				if(controle)
 					break;
 
+				/* anda com o quadrado para a direita */
 				JanelaAuxiliar.PontoSE.X++;
 				JanelaAuxiliar.PontoID.X++;
 			}
