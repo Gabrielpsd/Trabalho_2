@@ -92,8 +92,17 @@ void gerencia_programa(AMBIENTE *Ambiente)
 	}while(auxiliar != ENCERRARPROGRAMA);
 
 }
+/*		|---------------  Valida Janela ------------------------|
+		|		A função recebe uma janela e verifica se é 		|
+		|	possível colocar ela no ambiente, caso ela encontre	|
+		|	alguma inconsistência ao tentar posicionar a janela	|
+		|	o retorno será falso, caso seja possivel posicioar a| 
+		|	janela o retorno sera verdadeiro;					|
+		|-------------------------------------------------------|
+*/
 
-BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
+BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela)
+{
 
 	int contador, i , j ;
 
@@ -123,13 +132,18 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 
 	contador = 0; 
 	
+
+	/* ira fazer uma varredura por todos os pontos internos da janela passada e verificar se ela conflita com alguma janela 
+	*/
 	do/*(contador = 0; contador < Ambiente.Quantidade; ++contador)*/
 	{
 		i = 0;
 
+		/* controla a janela verticalmente */
 		while (i <= Janela.Linha)
 		{
 			j = 0;
+			/*controla a janela horizontalmente*/
 			while(j <= Janela.Coluna)
 			{
 				/* ------- Precisamos verificar se alguns dos quatro pontos da janela não estão conflitando com alguem */
@@ -137,8 +151,8 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela){
 				{
 
 					/* condicional que verifica se há algum ponto da janela sendo comparada que esta contida dentro de outra janela */
-					if(Janela.PontoSE.X + j >= Ambiente.Janela[contador].PontoSE.X && Janela.PontoSE.Y + i >= Ambiente.Janela[contador].PontoSE.Y)
-						if(Janela.PontoSE.X + j <= Ambiente.Janela[contador].PontoID.X && Janela.PontoSE.Y + i <= Ambiente.Janela[contador].PontoID.Y)
+					if((Janela.PontoSE.X + j >= Ambiente.Janela[contador].PontoSE.X) && (Janela.PontoSE.Y + i >= Ambiente.Janela[contador].PontoSE.Y))
+						if((Janela.PontoSE.X + j <= Ambiente.Janela[contador].PontoID.X) && (Janela.PontoSE.Y + i <= Ambiente.Janela[contador].PontoID.Y))
 							Retorno = FALSO;
 
 			
