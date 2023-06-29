@@ -9,19 +9,14 @@
 setDimensaoJanela() ,setTituloConsole() ,setCursorStatus(),Sleep() */ 
 #include "Quadrado.h" /* cria_janela() */
 
-/* essa referencia é utilizada para imprimir as infromacoes na tela
-ela somasse a posicao do ponto apenas para poder imprimir em determinado local da tela(no canto inferior esquerdo nesse caso)
-*/
-
 #define LINHA 30
 #define COLUNA 40
 #define VELOCIDADE 100 /*dada em milisegundos */ 
-#define CARACTER_HORIZONTAL 32
-#define CARACTER_VERTICAL 32
+#define CARACTER_HORIZONTAL 32 /* caso queira alterar o caraceter das colunas das janela sque é impresso (caratere em ASCII)*/
+#define CARACTER_VERTICAL 32	/* caso queira alterar o caraceter das colunas das janela sque é impresso (caratere em ASCII)*/
 #define CARACTER_IMPRESSO 42 /*ASTERISCO NA TABELA ASCII*/
 #define BORDA_JANELA 32 /* ESPACO NA TABELA ASCII*/
-
-/*dimensoa 168 * 42 */
+#define QUANTIDADE_QUADRADOS 10 /* define a quantidade maxima de quadrados */
 
 /*		|---------------  Gerencia programa --------------------|
 		|	 Realiza o cotrole de das movimentações do quadrado	|
@@ -88,10 +83,11 @@ void gerencia_programa(AMBIENTE *Ambiente)
 
 		/* realiza o incremento do i que nesse caso representa que mais um milissegundo no tempo de execucao */
 		++i;
-	
+	/*enquanto o parametro passo por le_telcas() não for para encerrar o programa ele fica preso nesse ciclo */
 	}while(auxiliar != ENCERRARPROGRAMA);
 
 }
+
 /*		|---------------  Valida Janela ------------------------|
 		|		A função recebe uma janela e verifica se é 		|
 		|	possível colocar ela no ambiente, caso ela encontre	|
@@ -115,7 +111,7 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela)
 	/* 1o comparando as linhas com as colunas */
 
 	/* Verificando se o ponto ID da janela se encotnra dentro do "Ambiente console", verificando se eles não são maiores que o ultimo ponto disponivel */
-	if(Janela.PontoID.X > Ambiente.PontoFinal.X || Janela.PontoID.Y > Ambiente.PontoFinal.Y)
+	if(Janela.PontoID.X > Ambiente.PontoFinal.X || Janela.PontoID.Y > Ambiente.PontoFinal.Y) 
 		return FALSO;
 
 	/* Verificando se o ponto se da janela se encotnra dentro do "Ambiente console", verificando se eles não são maiores que o ultimo ponto disponivel*/
@@ -132,7 +128,6 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela)
 
 	contador = 0; 
 	
-
 	/* ira fazer uma varredura por todos os pontos internos da janela passada e verificar se ela conflita com alguma janela 
 	*/
 	do/*(contador = 0; contador < Ambiente.Quantidade; ++contador)*/
@@ -176,6 +171,162 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela)
 }
 
 
+/*		|---------------  Adiciona QUadrado --------------------|
+		|		A funcao ira realizar a varredura da janela, 	|
+		|	e ira colocar a janela onde conseguir;				|
+		|		 O programa basicamente cria uma janela com 	|
+		|	tamanho aleatorio, e ira tentar posicionar o mesmo 	|
+		|	não cosneguindo ele diminui as coordenadas e tenta	|
+		|	posicionar novamente e assim ele vai a exaustao 	|
+		|	sendo que quando o quadrado atingiu o menor tamanho |
+		|	possivel ele sai sem adicionar janela alguma, e caso|
+		|	ele consiga colcoar alguma janela ele adiciona a 	|
+		|	janela na vetor Janela de Ambiente					| 
+		|														|
+		|-------------------------------------------------------|
+*/
+
+void adiciona_quadrado(AMBIENTE *Ambiente)
+{
+	JANELA JanelaAuxiliar; 
+	BOOLEANO controle;
+	int i, auxiliar; 
+
+
+	/* criando uam janela com valores aleatorios*/
+	JanelaAuxiliar.Linha = rand()%LINHA + 10;
+	JanelaAuxiliar.Coluna = rand()% COLUNA + 10;
+
+	JanelaAuxiliar.PontoSE.X = 1;
+	JanelaAuxiliar.PontoSE.Y = 1;
+
+	JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+	JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
+	JanelaAuxiliar.JanelaAtual = VERDADEIRO;
+	
+	/*definindo a janela atual como sendo a falsa a ser considerada no programa*/
+	auxiliar = Ambiente->JanelaAtual;
+	Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+	Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+	
+	/* quando eu tiver uam janela menor que 5x5 ela nao tera capacidade de armazenar um quadrado, logo não há necessidade de continuar tentando 
+	colocar mais janelas no programa*/
+	while(JanelaAuxiliar.Linha > 5 || JanelaAuxiliar.Coluna > 5)
+	{	
+		/*chute inicial, assume-se que é válida e verifica se algum valor é inválido */
+		controle = VERDADEIRO;
+		
+
+		/* andando com a janela auxiliar na vertical */
+		while(JanelaAuxiliar.PontoID.Y < Ambiente->PontoFinal.Y)
+		{
+			/*andando com a janela na horixontal*/
+			while(JanelaAuxiliar.PontoID.X <= Ambiente->PontoFinal.X)
+			{
+					i = 0;
+
+					while (i < Ambiente->Quantidade)
+					{		
+						/*
+							controle = Verifica_janelas(JanelaAuxiliar ,Ambiente->Janela[i]);
+						*/
+							controle = valida_janela(*Ambiente, JanelaAuxiliar);
+							++i;
+
+							if(controle == FALSO)
+								break;
+
+					}
+
+				if(controle)
+					break;
+
+				/* anda com o quadrado para a direita */
+				JanelaAuxiliar.PontoSE.X++;
+				JanelaAuxiliar.PontoID.X++;
+			}
+
+			if(controle)
+				break;
+			/*Recoloca o quadrado na posicao inicial em ponto superior esquerdo = 1 porem com o y incrementado  em uma posição para baixo */
+			JanelaAuxiliar.PontoID.Y++;
+			JanelaAuxiliar.PontoSE.Y++;
+			JanelaAuxiliar.PontoSE.X=1;
+			JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+		}
+
+		if(controle)
+			break;
+
+		/*redimenciona o quadrado diminuido o seu tamanho para tentar colcoar ele novamente*/
+		if(JanelaAuxiliar.Linha > 5)
+			JanelaAuxiliar.Linha--;
+		if(JanelaAuxiliar.Coluna > 5)
+			JanelaAuxiliar.Coluna--;
+
+
+		/* reposiciona o quadrado no inicio do console */
+		JanelaAuxiliar.PontoSE.X = 1;
+		JanelaAuxiliar.PontoSE.Y = 1;
+		JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
+		JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
+
+	}
+
+	if(controle == FALSO)
+	{
+		/* caso seja falso, indica que não foi possivel colocar nenhum quadrado na tela logo não há mais espaço para posicionar quadrado na tela*/
+		Ambiente->JanelaAtual=auxiliar;
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+
+	}
+		else if(controle)
+	{	
+		/* caso entre nessa condicional significa que a janela foi bem sucessida a ser posicionada 
+		basta nesse caso apenas colcar os outros atributos faltantes da janela e do quadrado interno */
+		++Ambiente->Quantidade;
+		Ambiente->JanelaAtual = Ambiente->Quantidade-1;
+		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
+		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = BLUE;;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15+1;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = rand()%4;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade = rand()%1000;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.X = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.X - Ambiente->Janela[Ambiente->JanelaAtual].Coluna / 2;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.Y = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.Y - Ambiente->Janela[Ambiente->JanelaAtual].Linha / 2;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+	}
+
+}
+
+
+/*		|---------------  Ajusta quadrado ----------------------|
+		|	 	Essa função é chamada quando há a movimentação	|
+		|	da janela externa, a funcao recebe o ambiente para 	|
+		|	pegar a janela atual e movimentar o quadrado interno|
+		|	caso ele esteja ulptrapassando alguma borda 		|
+		|-------------------------------------------------------|
+*/
+
+void ajusta_quadrado(QUADRADO *Quadrado, JANELA Janela)
+{
+
+
+		/* conflito na parte inferior da janela*/
+	if(Quadrado->Centro.Y == (Janela.PontoID.Y - 2))
+			Quadrado->Centro.Y--;
+	else if(Quadrado->Centro.Y == Janela.PontoSE.Y + 1) /*conlfito na parte superior da janela*/
+		Quadrado->Centro.Y++;
+
+		/* conflito na parte esquerda da janela */
+	if(Quadrado->Centro.X == Janela.PontoSE.X + 1)
+		Quadrado->Centro.X++;
+	else if(Quadrado->Centro.X == Janela.PontoID.X - 1)/* conlfito com a parte direita horizontalmente */
+		Quadrado->Centro.X--;
+
+}
+
 /*	|---------------  Apaga quadrado    ----------------|
 	|	 	Funcao ira receber um quadrado e atraves 	|
 	|	da sua coordenada do centro e ira realizar a 	|
@@ -188,11 +339,10 @@ BOOLEANO valida_janela(AMBIENTE Ambiente, JANELA Janela)
 
 void apaga_quadrado(QUADRADO Quadrado)
 {
-
 	int i,j;
 	
-
 	textbackground(BLACK);
+
 	for(i = 0; i < 3; ++i)
 	{
 		for(j = 0; j < 3; ++j)
@@ -222,6 +372,7 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 	
 	int i; 	
 
+	/* so imprimia a cor da janela que for a que estiver selecionada */
 	if(Janela.JanelaAtual == VERDADEIRO)
 		textbackground(Janela.CorJanela);
 	else
@@ -231,19 +382,19 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 	*/
 
 
-	for(i = 0; i < Janela.Coluna; i++)
+	for(i = 0; i <= Janela.Coluna; i++)
 	{
 		/* Linha superior */ 
 		gotoxy(Janela.PontoSE.X + i,Janela.PontoSE.Y);
 		putchar(CARACTER_HORIZONTAL);
 		
 		/*Linha inferior*/
-		gotoxy(Janela.PontoSE.X  + i,Janela.PontoID.Y-1);
+		gotoxy(Janela.PontoSE.X  + i,Janela.PontoID.Y);
 		putchar(CARACTER_HORIZONTAL);
 	
 	}
 
-	for(i = 0; i < Janela.Linha; i++)
+	for(i = 0; i <= Janela.Linha; i++)
 	{
 		/* Coluna horizontal da esquerda */ 
 		gotoxy(Janela.PontoSE.X,Janela.PontoSE.Y + i);
@@ -257,7 +408,7 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 
 	/*imprime a velocidade da janela */
 	textcolor(BLACK);
-	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y-1);
+	gotoxy(Janela.PontoSE.X,Janela.PontoID.Y);
 	printf("V:%d",Velocidade);
 
 	if(Janela.JanelaAtual == VERDADEIRO)
@@ -267,21 +418,13 @@ void gerencia_janela(JANELA Janela, int Velocidade)
 		printf("Atual");
 	}
 	textbackground(0);
+
 }
 
 /*	|----------------  Imprime Quadrado --------------------|
-	|	 	A funcao recebe o quadrado como referencia, 	|
-	|	a partir dai ele pega o ponto centro e atraves desse| 
-	|	ponto ele realiza as operacoes, a cor dos caracteres|
-	|	e a posicao de referencia estao contidas dentro da 	|
-	|	estrutura;											|
-	|		A funcao recebe o parametro enum que serve para |
-	|	imprimir ou apagar o quadrado da tela, caso o 		|
-	|	parametro seja para ativar ele imprime os dados como| 
-	|	sendo uma matriz; e caso o parametro seja DESTIVAR	|
-	|	ela realiza a exclusao sobreponto as posicoes do 	|
-	|	quadrado porem com um novo caracter 'espaco' com o 	|
-	|	fundo de cor preto;									|
+	|	 	A função recebe um quadrado e faz a impressao 	|
+	|	baseada no centro, imprime como se fosse uma matriz |
+	|	de 3X3 sendo o centro do quadrado o centro da matriz|
 	|-------------------------------------------------------|
 */
 
@@ -289,6 +432,7 @@ void imprime_quadrado(QUADRADO quadrado)
 {
 	int i, j; 
 	
+	/* so imprimia a cor do quadrado que for a que estiver selecionada */
 	if(quadrado.QuadradoAtual)
 		textcolor(quadrado.CorQuadrado);
 	else
@@ -299,6 +443,7 @@ void imprime_quadrado(QUADRADO quadrado)
 	{
 		for(j = 0; j < 3; ++j)
 		{
+			/* não é necessario imrpimir o centro da matriz, e i =j indica o centro da "matriz"*/
 			if(!(j== 1 && i ==1))
 			{
 			gotoxy((quadrado.Centro.X - 1) +j, (quadrado.Centro.Y - 1) + i);
@@ -343,7 +488,7 @@ void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
 			
 			break;
 
-		/* "andar" para baix nada mais é que aumentar minha coordenada do Y do centro do quadrado */
+		/* "andar" para baixo nada mais é que aumentar minha coordenada do Y do centro do quadrado */
 		case (BAIXO):
 			
 			
@@ -381,6 +526,63 @@ void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
 	imprime_quadrado(*Quadrado);
 }
 
+/*		|---------------  Set console --------------------------|
+		|	 Configura o console inicial ao mesmo tempo			|	
+		|	ele armazena os dados para que a janela retorne		|
+		|	a como estava no inicio do programa 	 		 	|
+		|	 Essa funcao tem tanto a atividade de configurar   	|
+		|	o console inicial como de restaurar as configurações|
+		|	que estavam anteriormente							|
+		|-------------------------------------------------------|
+*/
+
+void set_console(CONSOLE *console, ATIVIDADE status)
+{
+	if(status)
+	{
+		
+		/* armazena todos os valores atuais do console 
+		assim como sua posicao maxima, para que o console de usuario 
+		seja configurado no jogo e depois consiga retornar ao finalizar o programa
+		*/
+		
+		console->dimensao_inicial = getPosicaoJanela();	
+		console->dimensao_maxima = MaxDimensaoJanela();
+		console->posicao_inicial = getPosicaoJanela();
+
+		/* em alguns casos os valores iniciais da janela podem vir negativos 
+			caso isso ocorra o programa ira determinar um valor valido para os parametros 
+			para que quando forem utilizados eles consigam gerar um retorno
+		*/
+		if(console->dimensao_inicial.X <= 0 || console->dimensao_inicial.Y <= 0)
+			console->dimensao_inicial = console->dimensao_maxima; 
+		
+		if(console->posicao_inicial.X < 0 || console->posicao_inicial.Y < 0 )
+			console->posicao_inicial.X = console->posicao_inicial.Y = 0; 
+
+		
+		/* configura a tela do usuario */ 
+		setPosicaoJanela(0,0);
+		
+		setTituloConsole(TITULO);	
+		setCursorStatus(DESLIGAR);
+		setDimensaoJanela(console->dimensao_maxima.X, console->dimensao_maxima.Y);
+	
+		
+	}
+	else
+	{
+		
+		gotoxy(console->dimensao_maxima.X/2,console->dimensao_maxima.Y/2);
+		textcolor(WHITE);
+		printf("FIM DA EXECUCAO DO PROGRAMA");
+		gotoxy(console->dimensao_maxima.X,console->dimensao_maxima.Y);
+		setPosicaoJanela(console->posicao_inicial.X,console->posicao_inicial.Y);
+		setDimensaoJanela(console->dimensao_inicial.X,console->dimensao_inicial.Y);
+		setCursorStatus(LIGAR);
+	}
+}
+
 /*	|---------------  Le teclas ----------------------------|
 	|	 Funcao que é chamada quando o programa reconhece	|
 	|	um evento. Realizada a filtragem do evento realiza 	|
@@ -397,12 +599,14 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 	COORD Auxiliar;
 	JANELA JanelaAuxiliar;
 
+		/* caso o eventi identificado seja de teclado iniciara essa função */
 		if(evento.tipo_evento & KEY_EVENT)
 		{
 			/* caso a tecla digitada pelo usário seja a telca control */
 			if(evento.teclado.status_teclas_controle & LEFT_CTRL_PRESSED)
 			{
-				if(Ambiente->Quantidade < 10)
+				/* controla a quantidade de quadrados */
+				if(Ambiente->Quantidade < QUANTIDADE_QUADRADOS)
 					adiciona_quadrado(Ambiente);
 				
 				return REIPRIMIRJANELA;
@@ -412,6 +616,8 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 			else if (evento.teclado.status_tecla == LIBERADA)
 			{
 				
+				/*ira pegar o codigo da tecla lido, lembrado que as teclas foram definas na biblioteca console, 
+				referenciando seu nome a seu respectivo codigo */
 				switch(evento.teclado.codigo_tecla)
 				{
 					/* altera cor da janela atual para uma nova aleatoria*/
@@ -420,13 +626,12 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 						return REIPRIMIRJANELA;
 						break;
 
-					/* aumetna a velocida do quadrado atual em 1 milisegundo*/
+					/* aumenta a velocida do quadrado atual em 1 milisegundo*/
 					case F2:
 						
 						if(Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade < 1000)
 							Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade++;
-
-							
+		
 						break;
 					
 					/*-- diminui a velocidade interna do quadrado -- */ 
@@ -440,28 +645,35 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/* caso o usuario pressione a tecla da seta para direita no telcado */
 					case SETA_PARA_DIREITA:
 						
+						/* altera a direção do quadrado atual para a direita */
 						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = DIREITA;
 						break;
 
 					/* caso o usuario pressione a tecla da seta para esquerda no telcado */
 					case SETA_PARA_ESQUERDA:
+
+						/* altera a direção do quadrado atual para a esquerda */
 						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = ESQUERDA;
 						break;
 
 					/* caso o usuario pressione a tecla da seta para baixo no telcado */
 					case SETA_PARA_BAIXO:
+
+						/* altera a direção do quadrado atual para baixo */
 						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = BAIXO;
 						break;
 					
 					/* caso o usuario pressione a tecla da seta para cima no telcado */
 					case SETA_PARA_CIMA:
+
+						/* altera a direção do quadrado atual para a cima */
 						Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = CIMA;
 						break;
 					
 					/*-- aumenta area do quadrado externo para esquerda -- */
 					case F3:
 
-						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X--;
@@ -471,6 +683,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 						/* CASO VALIDO REALIZA A SUBISTUICAO DA JANELA */
 						if(valida_janela(*Ambiente, JanelaAuxiliar))
 						{
+							/* atrbui-se a janela auxilia para a atual caso a vlaidação esteja correta */
 							Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 							ajusta_quadrado( &Ambiente->Quadrado[Ambiente->JanelaAtual],Ambiente->Janela[Ambiente->JanelaAtual]);
 						}
@@ -479,7 +692,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- diminui a borda do quadrado da esquerda --*/ 							
 					case F4:
 
-						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.X++;
@@ -497,7 +710,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- aumenta a area do quadrado para direita --*/
 					case F5:
 
-						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X++;
@@ -515,7 +728,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- diminui a area da do quadrado para direita --*/
 					case F6: 
 
-						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.X--;
@@ -533,6 +746,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- aumenta a areda do quadrado para cima --*/
 					case F7:
 						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y--;
@@ -549,6 +763,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- diminui a area superior --*/ 
 					case F8:
 						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoSE.Y++;
@@ -566,6 +781,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*-- aumenta a area para baixo --*/
 					case F9:
 						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y++;
@@ -582,6 +798,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 					/*--diminui a area para baixo --*/
 					case F10:
 						
+						/* faz-se uma copia da janela atual para uma auxiliar para garantir a permanecia dos valores*/
 						JanelaAuxiliar = Ambiente->Janela[Ambiente->JanelaAtual];
 
 						JanelaAuxiliar.PontoID.Y--;
@@ -622,16 +839,17 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 				/* andara por todas as janeas que há no ambiente e verifica se as coordenadas que a funcao evento retorna esta contido em alguma delas*/
 				for(controle = 0; controle < Ambiente->Quantidade; ++controle)
 				{
-					if((Ambiente->Janela[controle].PontoSE.X < Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y < Auxiliar.Y))
+					if((Ambiente->Janela[controle].PontoSE.X-1 <= Auxiliar.X) && (Ambiente->Janela[controle].PontoSE.Y-1 <= Auxiliar.Y))
 					{
 						/* caso a coordenada retornada por Evento esteja no meio de alguma janela, essa se tornara a janela principal*/
 						if((Ambiente->Janela[controle].PontoID.X > Auxiliar.X) && (Ambiente->Janela[controle].PontoID.Y > Auxiliar.Y))
 						{
-						Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-						Ambiente->JanelaAtual = controle;
-						Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-						Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+							Ambiente->JanelaAtual = controle;
+							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+							Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = BLUE;
 						}
 					}
 
@@ -644,241 +862,4 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 		}
 
 		return 1; 
-}
-
-/*		|---------------  Ajusta quadrado ----------------------|
-		|	 	Essa função é chamada quando há a movimentação	|
-		|	da janela externa, a funcao recebe o ambiente para 	|
-		|	pegar a janela atual e movimentar o quadrado interno|
-		|	caso ele esteja ulptrapassando alguma borda 		|
-		|-------------------------------------------------------|
-*/
-
-void ajusta_quadrado(QUADRADO *Quadrado, JANELA Janela)
-{
-
-
-		/* conflito na parte inferior da janela*/
-	if(Quadrado->Centro.Y == (Janela.PontoID.Y - 2))
-			Quadrado->Centro.Y--;
-	else if(Quadrado->Centro.Y == Janela.PontoSE.Y + 1) /*conlfito na parte superior da janela*/
-		Quadrado->Centro.Y++;
-
-		/* conflito na parte esquerda da janela */
-	if(Quadrado->Centro.X == Janela.PontoSE.X + 1)
-		Quadrado->Centro.X++;
-	else if(Quadrado->Centro.X == Janela.PontoID.X - 1)/* conlfito com a parte direita horizontalmente */
-		Quadrado->Centro.X--;
-
-}
-
-
-/*		|---------------  Set console --------------------------|
-		|	 Configura o console inicial ao mesmo tempo			|	
-		|	ele armazena os dados para que a janela retorne		|
-		|	a como estava no inicio do programa 	 		 	|
-		|	 Essa funcao tem tanto a atividade de configurar   	|
-		|	o console inicial como de restaurar as configurações|
-		|	que estavam anteriormente							|
-		|-------------------------------------------------------|
-*/
-void set_console(CONSOLE *console, ATIVIDADE status)
-{
-	if(status){
-		
-		/* armazena todos os valores atuais do console 
-		assim como sua posicao maxima, para que o console de usuario 
-		seja configurado no jogo e depois consiga retornar ao finalizar o programa
-		*/
-		
-		console->dimensao_inicial = getPosicaoJanela();	
-		console->dimensao_maxima = MaxDimensaoJanela();
-		console->posicao_inicial = getPosicaoJanela();
-
-		/* em alguns casos os valores iniciais da janela podem vir negativos 
-			caso isso ocorra o programa ira determinar um valor valido para os parametros 
-			para que quando forem utilizados eles consigam gerar um retorno
-		*/
-		if(console->dimensao_inicial.X <= 0 || console->dimensao_inicial.Y <= 0)
-			{
-				console->dimensao_inicial = console->dimensao_maxima; 
-			}
-		
-		if(console->posicao_inicial.X < 0 || console->posicao_inicial.Y < 0 )
-		{
-				console->posicao_inicial.X = 0; 
-				console->posicao_inicial.Y = 0;
-		}
-		
-		/* configura a tela do usuario */ 
-		setPosicaoJanela(0,0);
-		
-		setEstadoBarraTarefas(INVISIVEL);
-		setTituloConsole(TITULO);	
-		setCursorStatus(DESLIGAR);
-		setDimensaoJanela(console->dimensao_maxima.X, console->dimensao_maxima.Y);
-	
-		
-	}else{
-		
-		gotoxy(console->dimensao_maxima.X/4,console->dimensao_maxima.Y/4);
-		textcolor(WHITE);
-		printf("FIM DA EXECUCAO DO PROGRAMA");
-		gotoxy(console->dimensao_maxima.X,console->dimensao_maxima.Y);
-		setPosicaoJanela(console->posicao_inicial.X,console->posicao_inicial.Y);
-		setDimensaoJanela(console->dimensao_inicial.X,console->dimensao_inicial.Y);
-		setEstadoBarraTarefas(VISIVEL);
-		setCursorStatus(LIGAR);
-	}
-}
-
-/*		|---------------  Adiciona QUadrado --------------------|
-		|		A funcao ira realizar a varredura da janela, 	|
-		|	e ira colocar a janela onde conseguir;				|
-		|		 O programa basicamente cria uma janela com 	|
-		|	tamanho aleatorio, e ira tentar posicionar o mesmo 	|
-		|	não cosneguindo ele diminui as coordenadas e tenta	|
-		|	posicionar novamente e assim ele vai a exaustao 	|
-		|	sendo que quando o quadrado atingiu o menor tamanho |
-		|	possivel ele sai sem adicionar janela alguma, e caso|
-		|	ele consiga colcoar alguma janela ele adiciona a 	|
-		|	janela na vetor Janela de Ambiente					| 
-		|														|
-		|-------------------------------------------------------|
-*/
-void adiciona_quadrado(AMBIENTE *Ambiente)
-{
-	JANELA JanelaAuxiliar; 
-	BOOLEANO controle;
-	int i, auxiliar; 
-
-
-	/* criando uam janela com valores aleatorios*/
-	JanelaAuxiliar.Linha = rand()%LINHA + 10;
-	JanelaAuxiliar.Coluna = rand()% COLUNA + 10;
-
-	JanelaAuxiliar.PontoSE.X = 1;
-	JanelaAuxiliar.PontoSE.Y = 1;
-
-	JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
-	JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
-	JanelaAuxiliar.JanelaAtual = VERDADEIRO;
-	
-	/*definindo a janela atual como sendo a falsa a ser considerada no programa*/
-	auxiliar = Ambiente->JanelaAtual;
-	Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
-	Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
-	
-	/* quando eu tiver uam janela menor que 5x5 ela nao tera capacidade de armazenar um quadrado, logo não há necessidade de continuar tentando 
-	colocar mais janelas no programa*/
-	while(JanelaAuxiliar.Linha > 5 && JanelaAuxiliar.Coluna > 5)
-	{	
-		/*chute inicial, assume-se que é válida e verifica se algum valor é inválido */
-		controle = VERDADEIRO;
-		
-
-		/* andando com a janela auxiliar na vertical */
-		while(JanelaAuxiliar.PontoID.Y < Ambiente->PontoFinal.Y)
-		{
-			/*andando com a janela na horixontal*/
-			while(JanelaAuxiliar.PontoID.X <= Ambiente->PontoFinal.X)
-			{
-					i = 0;
-
-					while (i < Ambiente->Quantidade)
-					{		
-						/*
-							controle = Verifica_janelas(JanelaAuxiliar ,Ambiente->Janela[i]);
-						*/
-							controle = valida_janela(*Ambiente, JanelaAuxiliar);
-							++i;
-
-							if(controle == FALSO)
-								break;
-
-					}
-
-				if(controle)
-					break;
-
-				/* anda com o quadrado para a direita */
-				JanelaAuxiliar.PontoSE.X++;
-				JanelaAuxiliar.PontoID.X++;
-			}
-
-			if(controle)
-				break;
-
-			JanelaAuxiliar.PontoID.Y++;
-			JanelaAuxiliar.PontoSE.Y++;
-			JanelaAuxiliar.PontoSE.X=1;
-			JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
-		}
-
-		if(controle)
-			break;
-
-		JanelaAuxiliar.Linha--;
-		JanelaAuxiliar.Coluna--;
-
-		JanelaAuxiliar.PontoSE.X = 1;
-		JanelaAuxiliar.PontoSE.Y = 1;
-
-		JanelaAuxiliar.PontoID.X = JanelaAuxiliar.PontoSE.X + JanelaAuxiliar.Coluna;
-		JanelaAuxiliar.PontoID.Y = JanelaAuxiliar.PontoSE.Y +JanelaAuxiliar.Linha;
-
-	}
-
-	if(controle == FALSO)
-	{
-
-		Ambiente->JanelaAtual=auxiliar;
-		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-
-	}
-		else if(controle)
-	{	
-		
-		++Ambiente->Quantidade;
-		Ambiente->JanelaAtual = Ambiente->Quantidade-1;
-		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
-		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
-		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = rand()%15 + 1;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15+1;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = rand()%4;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade = rand()%1000;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.X = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.X - Ambiente->Janela[Ambiente->JanelaAtual].Coluna / 2;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.Y = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.Y - Ambiente->Janela[Ambiente->JanelaAtual].Linha / 2;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
-	}
-
-}
-
-BOOLEANO Verifica_janelas2(JANELA Janela1, JANELA Janela2)
-{	
-	BOOLEANO Retorno; 
-	int i, j ; 
-
-	i = 0;
-
-	Retorno = VERDADEIRO;
-
-	while(i < Janela1.Linha)
-	{	
-		j = 0;
-
-		while( j < Janela1.Coluna)
-		{
-			if(Janela1.PontoSE.X + j >= Janela2.PontoSE.X && Janela1.PontoSE.Y + i >= Janela2.PontoSE.Y)
-				if(Janela1.PontoSE.X + j  <= Janela2.PontoID.X && Janela1.PontoSE.Y + i <= Janela2.PontoID.Y)
-					Retorno = FALSO;
-			
-			++j;
-		}
-
-		++i;
-	}
-
-	return Retorno;
 }

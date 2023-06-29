@@ -1,12 +1,12 @@
 /* 
 
 	programa: Quadrados multiplos animados 
-	Descrição: O executa no prompt de comando multiplas janelas aniamdas, onde o usuario pode interagir simultaneamente com todas as 
+	Descrição: O executa no prompt de comando multiplas janelas animadas, onde o usuario pode interagir simultaneamente com todas as 
 	janelas;
 	
 	Programador: Gabriel Pereira dos Santos Dias
 	RGM: 43562
-	data de modificação: 25/05/2023
+	data de modificação: 29/06/2023
 	
 	*-------- Regras de utilização do programa -----* 
 	
@@ -43,6 +43,7 @@ int main(int argc , char **argv)
 	Ambiente.Quantidade = 0;
 	Ambiente.JanelaAtual = 0;
 	adiciona_quadrado(&Ambiente);
+
 	clrscr();
 
 	gerencia_janela(Ambiente.Janela[0], Ambiente.Quadrado[0].Velocidade);
