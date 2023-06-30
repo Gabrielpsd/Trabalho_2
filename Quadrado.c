@@ -7,7 +7,9 @@
 #include "conio_v3.2.4.h" /* textbackground(),gotoxy(),putchar(),textColor() */ 
 #include "console_v1.5.4.h" /* COORD ,getPosicaoJanela(),MaxDimensaoJanela(),getPosicaoJanela(), setPosicaoJanela() 
 setDimensaoJanela() ,setTituloConsole() ,setCursorStatus(),Sleep() */ 
-#include "Quadrado.h" /* cria_janela() */
+#include "Quadrado.h" /* BOLADAVEZ, ATIVIDADE, BOOLEANO, ,OQUEFAZER ,DIRECAO,CONSOLE,JANELA, QUADRADO, AMBIENTE, valida_janela(),
+cria_janela(),le_teclas(),adiciona_quadrado(),ajusta_quadrado(),apaga_quadrado(),gerencia_janela(),imprime_quadrado(),gerencia_programa()
+movimenta_quadrado(),set_console() */
 
 #define LINHA 30
 #define COLUNA 40
@@ -17,6 +19,11 @@ setDimensaoJanela() ,setTituloConsole() ,setCursorStatus(),Sleep() */
 #define CARACTER_IMPRESSO 42 /*ASTERISCO NA TABELA ASCII*/
 #define BORDA_JANELA 32 /* ESPACO NA TABELA ASCII*/
 #define QUANTIDADE_QUADRADOS 10 /* define a quantidade maxima de quadrados */
+
+/*
+	REGRA DE ORDENACAO: as funcoes estao ordenadas alfabeticamente por TIPO DE RETORNO, caso haja duas funcoes com o mesmo tipo de retorno 
+	será ordenada alfabeticamente pelo NOME DA FUNCAO;
+*/
 
 /*		|---------------  Gerencia programa --------------------|
 		|	 Realiza o cotrole de das movimentações do quadrado	|
@@ -290,7 +297,7 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 		Ambiente->Janela[Ambiente->JanelaAtual] = JanelaAuxiliar;
 		Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 		Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = BLUE;;
-		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = rand()%15+1;
+		Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = LIGHTGRAY;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Direcao = rand()%4;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Velocidade = rand()%1000;
 		Ambiente->Quadrado[Ambiente->JanelaAtual].Centro.X = Ambiente->Janela[Ambiente->JanelaAtual].PontoID.X - Ambiente->Janela[Ambiente->JanelaAtual].Coluna / 2;
@@ -546,39 +553,32 @@ void set_console(CONSOLE *console, ATIVIDADE status)
 		seja configurado no jogo e depois consiga retornar ao finalizar o programa
 		*/
 		
-		console->dimensao_inicial = getPosicaoJanela();	
-		console->dimensao_maxima = MaxDimensaoJanela();
+		console->dimensao_inicial = tamanhoJanelaConsole();
 		console->posicao_inicial = getPosicaoJanela();
+		console->dimensao_maxima = MaxDimensaoJanela();
 
-		/* em alguns casos os valores iniciais da janela podem vir negativos 
-			caso isso ocorra o programa ira determinar um valor valido para os parametros 
-			para que quando forem utilizados eles consigam gerar um retorno
-		*/
-		if(console->dimensao_inicial.X <= 0 || console->dimensao_inicial.Y <= 0)
-			console->dimensao_inicial = console->dimensao_maxima; 
-		
-		if(console->posicao_inicial.X < 0 || console->posicao_inicial.Y < 0 )
-			console->posicao_inicial.X = console->posicao_inicial.Y = 0; 
-
-		
 		/* configura a tela do usuario */ 
 		setPosicaoJanela(0,0);
-		
 		setTituloConsole(TITULO);	
 		setCursorStatus(DESLIGAR);
 		setDimensaoJanela(console->dimensao_maxima.X, console->dimensao_maxima.Y);
 	
-		
 	}
 	else
 	{
-		
-		gotoxy(console->dimensao_maxima.X/2,console->dimensao_maxima.Y/2);
+		clrscr();
+		/* configura a tela do usuario para os valores iniciais na chamada do programa */
+		gotoxy(console->dimensao_maxima.X/2,console->dimensao_maxima.Y/4);
 		textcolor(WHITE);
+		printf("----------------------------");
+		gotoxy(console->dimensao_maxima.X/2,(console->dimensao_maxima.Y/4)+1);
 		printf("FIM DA EXECUCAO DO PROGRAMA");
-		gotoxy(console->dimensao_maxima.X,console->dimensao_maxima.Y);
+		gotoxy(console->dimensao_maxima.X/2,(console->dimensao_maxima.Y/4)+2);
+		printf("----------------------------");
 		setPosicaoJanela(console->posicao_inicial.X,console->posicao_inicial.Y);
 		setDimensaoJanela(console->dimensao_inicial.X,console->dimensao_inicial.Y);
+		
+		
 		setCursorStatus(LIGAR);
 	}
 }
@@ -611,7 +611,22 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 				
 				return REIPRIMIRJANELA;
 			}
+			else if(evento.teclado.status_teclas_controle & LEFT_ALT_PRESSED)
+			{
+				do
+				{
+					controle = rand()%Ambiente->Quantidade;
 
+				}while((BOLADAVEZ)controle == Ambiente->JanelaAtual);
+
+				Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
+				Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
+				Ambiente->JanelaAtual = controle;
+				Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
+				Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
+				Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = BLUE;
+
+			}
 			/* caso a telca digitada pelo usuario seja diferente de CTRL*/
 			else if (evento.teclado.status_tecla == LIBERADA)
 			{
@@ -812,10 +827,6 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 						}
 						
 						return REIPRIMIRJANELA;
-
-					/*--alterna a cor do quadrado --*/
-					case CTRL:
-						return 0;
 						
 					/*-- alterna a cor do quadrado --*/
 					case TAB:
@@ -850,6 +861,7 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 							Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = VERDADEIRO;
 							Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
 							Ambiente->Janela[Ambiente->JanelaAtual].CorJanela = BLUE;
+							Ambiente->Quadrado[Ambiente->JanelaAtual].CorQuadrado = LIGHTGRAY;
 						}
 					}
 

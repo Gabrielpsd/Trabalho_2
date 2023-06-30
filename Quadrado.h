@@ -5,10 +5,11 @@
 
 #include "console_v1.5.4.h" /* EVENTO */
 
-#define TITULO "Quadrado Animado"  
-#define QUANTIDADE 10
-#define CTRL 29
+/* titulo do console */
+#define TITULO "Multiplos Quadrados Animados"  
 
+/* quantidade de quadrados maximo na tela*/
+#define QUANTIDADE 10
 /* #-#-#-#-#-#-#-#-#-# Declaracoes de tipos de dados e constantes #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#*/
  
 
@@ -108,6 +109,7 @@ typedef struct _tela
 	COORD dimensao_inicial;
 	COORD posicao_inicial;
 	COORD dimensao_maxima;
+	int horizontal,vertical;
 	
 }CONSOLE;
 
@@ -272,6 +274,7 @@ void gerencia_janela(JANELA, INT);
 */
 
 void imprime_quadrado(QUADRADO);
+
 
 /*	|--------------- Gerencia programa   ---------------|
 	|	 	Funcao que realiza as chamadas do 			|

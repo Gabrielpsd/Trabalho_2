@@ -1,16 +1,16 @@
 /* 
 
-	programa: Quadrados multiplos animados 
+	programa: Multiplos quadrados animados
 	Descrição: O executa no prompt de comando multiplas janelas animadas, onde o usuario pode interagir simultaneamente com todas as 
-	janelas;
+	janelas, podendo adicionar, trocar a cor a direção e também velocidade do ;
 	
 	Programador: Gabriel Pereira dos Santos Dias
 	RGM: 43562
-	data de modificação: 29/06/2023
+	data de modificação: 30/06/2023
 	
 	*-------- Regras de utilização do programa -----* 
 	
-	Obs: Para evitar erros durante a execução recomenda-se que configure seu prompt de comando para que utilize as propriedades herdadas do prompt 
+	Obs: Para evitar erros durante a execuçãoss recomenda-se que configure seu prompt de comando para que utilize as propriedades herdadas do prompt 
 	
 	codigo para compilação: gcc main.c -o saida.exe conio_v3.2.4.c console_v1.5.4.c quadrado.c -Wall -Werror -Wextra -pedantic -lwinmm  
 	
