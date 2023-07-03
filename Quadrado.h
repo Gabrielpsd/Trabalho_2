@@ -54,7 +54,7 @@ typedef enum
 }ATIVIDADE;
 
 /*	|------------------- Booleano ------------------|
-	|		Tipo de dado que armazena um valor 		|
+	|		Tipo de dado que assume um valor 		|
 	|	logico										|
 	|-----------------------------------------------|
 */
@@ -163,6 +163,7 @@ typedef struct _ambiente
 	int Quantidade;
 	COORD PontoInicial, PontoFinal; 
 	BOLADAVEZ JanelaAtual;
+	
 }AMBIENTE;
 
 /* #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# FIM DAS DECLARAÇÕES DAS VARIAVEIS E CONSTANTES #-#-#-#-#-#-#-#-#-#-#*/ 

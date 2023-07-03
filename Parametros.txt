@@ -9,5 +9,5 @@
 7 - conseguir movimentar todos os quadrados simultanemente- sem conflito(FEITO);
 8 - conseguir implementar o conflito em todas as janelas simultanemtente(FEITO); 
  - Imprimir apenas uma janela, e ir colocando mais com cliques do usuario(FEITO);
- - criar a funcao que determina com qual janela esta se trabalhando;
- - implementar a seleção por mouse;
+ - criar a funcao que determina com qual janela esta se trabalhando(FEITO);
+ - implementar a seleção por mouse(FEITO);

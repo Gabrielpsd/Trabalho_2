@@ -5,19 +5,22 @@
 #include <Windows.h> /* Sleep() */
 
 #include "conio_v3.2.4.h" /* textbackground(),gotoxy(),putchar(),textColor() */ 
-#include "console_v1.5.4.h" /* COORD ,getPosicaoJanela(),MaxDimensaoJanela(),getPosicaoJanela(), setPosicaoJanela() 
-setDimensaoJanela() ,setTituloConsole() ,setCursorStatus(),Sleep() */ 
+#include "console_v1.5.4.h" /* COORD ,getPosicaoJanela(), setPosicaoJanela(),setDimensaoJanela() ,
+setTituloConsole() ,setCursorStatus(), tamanhoJanelaConsole(); getPosicaoJanela();MaxDimensaoJanela();*/ 
 #include "Quadrado.h" /* BOLADAVEZ, ATIVIDADE, BOOLEANO, ,OQUEFAZER ,DIRECAO,CONSOLE,JANELA, QUADRADO, AMBIENTE, valida_janela(),
 cria_janela(),le_teclas(),adiciona_quadrado(),ajusta_quadrado(),apaga_quadrado(),gerencia_janela(),imprime_quadrado(),gerencia_programa()
 movimenta_quadrado(),set_console() */
 
+/*tamanhos maximos que um quadrado pode ser gerado aleatoriamente*/
 #define LINHA 30
 #define COLUNA 40
+
 #define VELOCIDADE 100 /*dada em milisegundos */ 
 #define CARACTER_HORIZONTAL 32 /* caso queira alterar o caraceter das colunas das janela sque é impresso (caratere em ASCII)*/
 #define CARACTER_VERTICAL 32	/* caso queira alterar o caraceter das colunas das janela sque é impresso (caratere em ASCII)*/
 #define CARACTER_IMPRESSO 42 /*ASTERISCO NA TABELA ASCII*/
 #define BORDA_JANELA 32 /* ESPACO NA TABELA ASCII*/
+
 #define QUANTIDADE_QUADRADOS 10 /* define a quantidade maxima de quadrados */
 
 /*
@@ -234,17 +237,18 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 
 					while (i < Ambiente->Quantidade)
 					{		
-						/*
-							controle = Verifica_janelas(JanelaAuxiliar ,Ambiente->Janela[i]);
-						*/
+						
 							controle = valida_janela(*Ambiente, JanelaAuxiliar);
 							++i;
-
+							
+							/* achou algum conflito ou outra invalidacao entre as janelas */
 							if(controle == FALSO)
 								break;
 
 					}
 
+				/* caso o controle seja verdadeiro, significa que a janela passou na validação e pode ser colocada no console, logo pode sair desse 
+				ciclo de execução */
 				if(controle)
 					break;
 
@@ -252,6 +256,9 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 				JanelaAuxiliar.PontoSE.X++;
 				JanelaAuxiliar.PontoID.X++;
 			}
+
+			/* caso o controle seja verdadeiro, significa que a janela passou na validação e pode ser colocada no console, logo pode sair desse 
+			ciclo de execução */
 
 			if(controle)
 				break;
@@ -265,7 +272,7 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 		if(controle)
 			break;
 
-		/*redimenciona o quadrado diminuido o seu tamanho para tentar colcoar ele novamente*/
+		/*redimenciona o quadrado diminuido o seu tamanho para tentar colocar ele novamente*/
 		if(JanelaAuxiliar.Linha > 5)
 			JanelaAuxiliar.Linha--;
 		if(JanelaAuxiliar.Coluna > 5)
@@ -288,7 +295,8 @@ void adiciona_quadrado(AMBIENTE *Ambiente)
 		Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = VERDADEIRO;
 
 	}
-		else if(controle)
+	/* if adicionado por precaução, mas não necessita*/
+	else if(controle)
 	{	
 		/* caso entre nessa condicional significa que a janela foi bem sucessida a ser posicionada 
 		basta nesse caso apenas colcar os outros atributos faltantes da janela e do quadrado interno */
@@ -348,8 +356,11 @@ void apaga_quadrado(QUADRADO Quadrado)
 {
 	int i,j;
 	
+	/*coloca a cor do quadrado para preto*/
 	textbackground(BLACK);
 
+
+	/* realiza a sobreposicao das posicoes do quadrado atual pela cor preta */
 	for(i = 0; i < 3; ++i)
 	{
 		for(j = 0; j < 3; ++j)
@@ -545,6 +556,7 @@ void movimenta_quadrado(QUADRADO *Quadrado, JANELA janela)
 
 void set_console(CONSOLE *console, ATIVIDADE status)
 {
+	/* caso o ususario tenha iniciado o programa*/
 	if(status)
 	{
 		
@@ -564,6 +576,7 @@ void set_console(CONSOLE *console, ATIVIDADE status)
 		setDimensaoJanela(console->dimensao_maxima.X, console->dimensao_maxima.Y);
 	
 	}
+	/*caso o usuario tenha pressionado a telca ESC */
 	else
 	{
 		clrscr();
@@ -611,14 +624,20 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 				
 				return REIPRIMIRJANELA;
 			}
+			/* caso a tecla pressionada seja o ALT esquerdo */
 			else if(evento.teclado.status_teclas_controle & LEFT_ALT_PRESSED)
 			{
+				/* o sistema ira sortear uma nova janela de forma aleatoria*/
+
+				/* enquanto o numero gerado for o da janela atual ele ficara gerando o um novo valor*/
 				do
 				{
 					controle = rand()%Ambiente->Quantidade;
 
+				/* foi colocado um operador de castin para o tipo BOLADAVEZ*/
 				}while((BOLADAVEZ)controle == Ambiente->JanelaAtual);
 
+				/*fazendo a troca da janela atual, colocando falso para a que estava e depois passsando para verdadeiro a nova janela*/
 				Ambiente->Quadrado[Ambiente->JanelaAtual].QuadradoAtual = FALSO;
 				Ambiente->Janela[Ambiente->JanelaAtual].JanelaAtual = FALSO;
 				Ambiente->JanelaAtual = controle;
@@ -839,11 +858,13 @@ OQUEFAZER le_teclas(EVENTO evento, AMBIENTE *Ambiente)
 				}
 			}	
 		} 
-		else if(evento.tipo_evento & MOUSE_EVENT) /* caso o evento que seja feito no console seja de mouse */
+		/* caso o evento que seja feito no console seja de mouse */
+		else if(evento.tipo_evento & MOUSE_EVENT)
 		{
 			if(evento.mouse.botao_clicou & BOTAO_ESQUERDO_PRESSIONADO)
 			{
-
+				
+				/*variavel auxiliar que recebera o valor de COORD retornado pelo evento */
 				Auxiliar  = evento.mouse.posicao;
 		
 
